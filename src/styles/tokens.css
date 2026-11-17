@@ -1,0 +1,39 @@
+/* Identity: dark off-black canvas, off-white type, flat colour blocks and sticker chips, pill buttons.
+   Palette and type taken from elespacio.net (off-black #201e1f, off-white #f4efe8, pink, orange, purple, green, blue, ochre). */
+@font-face { font-family: "Bricolage Grotesque"; src: url(/fonts/bricolage.woff2) format("woff2"); font-weight: 200 800; font-display: swap; }
+@font-face { font-family: "Instrument Serif"; src: url(/fonts/instrument-serif.woff2) format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: "Instrument Serif"; src: url(/fonts/instrument-serif-italic.woff2) format("woff2"); font-style: italic; font-weight: 400; font-display: swap; }
+
+:root {
+  color-scheme: dark;
+  --ink: #201e1f;
+  --paper: #f4efe8;
+  --pink: #ffabc8;
+  --orange: #fc4109;
+  --purple: #e7bfff;
+  --green: #1c3d24;
+  --blue: #5d9dc5;
+  --sand: #e3b866;          /* a lighter ochre, so text on it stays readable */
+
+  --bg: var(--ink);
+  --fg: var(--paper);
+  --muted: #c9c3bb;          /* secondary text on the dark canvas */
+  --line: rgba(244, 239, 232, 0.34);
+  --surface: #2b2829;        /* raised panels on the canvas */
+  --focus: var(--pink);
+
+  --font: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --gut: clamp(1rem, 4vw, 2.5rem);
+  --tap: 3rem;
+  --radius: 1.25rem;
+}
+
+/* A tone is a block colour and the text colour that is readable on it. */
+.tone-orange { --tone: var(--orange); --on: var(--ink); }
+.tone-blue   { --tone: var(--blue);   --on: var(--ink); }
+.tone-purple { --tone: var(--purple); --on: var(--ink); }
+.tone-pink   { --tone: var(--pink);   --on: var(--ink); }
+.tone-sand   { --tone: var(--sand);   --on: var(--ink); }
+.tone-green  { --tone: var(--green);  --on: var(--paper); }

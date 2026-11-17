@@ -1,0 +1,10 @@
+const base = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2.4, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true, focusable: false };
+export const Arrow = (p) => <svg {...base} {...p}><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
+export const ArrowBack = (p) => <svg {...base} {...p}><path d="M19 12H5M11 6l-6 6 6 6" /></svg>;
+export const Check = (p) => <svg {...base} {...p}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>;
+export const Plus = (p) => <svg {...base} {...p}><path d="M12 5v14M5 12h14" /></svg>;
+export const Minus = (p) => <svg {...base} {...p}><path d="M5 12h14" /></svg>;
+export const Cross = (p) => <svg {...base} {...p}><path d="M6 6l12 12M18 6L6 18" /></svg>;
+export const Up = (p) => <svg {...base} {...p}><path d="M12 19V5M6 11l6-6 6 6" /></svg>;
+export const Down = (p) => <svg {...base} {...p}><path d="M12 5v14M6 13l6 6 6-6" /></svg>;
+export const Star = (p) => <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" {...p}><path d="M12 0c.9 6.2 5.8 11.1 12 12-6.2.9-11.1 5.8-12 12-.9-6.2-5.8-11.1-12-12C6.2 11.1 11.1 6.2 12 0z" /></svg>;
