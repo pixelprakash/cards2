@@ -2,6 +2,7 @@
 // Builds sample sessions, then checks that every one survives the server cleaning, flattens to rows,
 // produces a profile from its own words only, and that the route guard sends people to the right place.
 globalThis.window = { innerWidth: 1280 };
+process.env.LID_LOCAL_DB = "1";   // in-memory Postgres, no account needed
 const { sampleSessions } = await import("../src/researcher/sample.js");
 const { sanitise } = await import("../api/_record.js");
 const { flatten } = await import("../src/export/flatten.js");
@@ -56,6 +57,26 @@ ok(guard(f, PATH.institution) === PATH.activities, "institution needs resource a
 ok(DIMENSIONS.filter((d) => d.required).length === 6, "six required dimensions");
 ok(!requiredDimensionsDone(b) && !allocationDone(b), "nothing done on a new session");
 ok(DIMENSIONS.every((d) => dimState(b, d) === "todo"), "all dimensions start as not started");
+
+// Database: save, update, list, rate limit, withdraw, researcher delete (in-memory Postgres).
+const browserWindow = globalThis.window; delete globalThis.window;   // the in-memory Postgres behaves differently when it thinks it is in a browser
+const db = await import("../api/_db.js");
+const one = sanitise(JSON.parse(JSON.stringify(sessions.find((x) => x.route === "configure"))));
+await db.saveSession(one);
+await db.saveSession({ ...one, furthest: "done", updatedAt: new Date().toISOString() });
+let listed = await db.listSessions();
+ok(listed.length === 1 && listed[0].furthest === "done", "save is an upsert and list returns the session");
+await db.saveSession({ ...one, code: "LID-ZZZZZZ", furthest: "entry" });
+listed = await db.listSessions();
+ok(listed[0].furthest === "done", "a different code cannot overwrite an existing session id");
+ok((await db.deleteSession({ id: one.id, code: "LID-ZZZZZZ" })) === 0, "withdraw needs the right code");
+ok((await db.deleteSession({ id: one.id, code: one.code })) === 1, "withdraw with id and code deletes it");
+await db.saveSession(one);
+ok((await db.deleteSession({ code: one.code })) === 1, "researcher delete by code");
+ok((await db.listSessions()).length === 0, "nothing left after deletes");
+const hits = []; for (let i = 0; i < 3; i++) hits.push(await db.hit("test-ip", 600));
+ok(hits.join() === "1,2,3", "rate counter counts up");
+globalThis.window = browserWindow;
 
 // Dashboard maths run on samples.
 const o = overview(sessions);

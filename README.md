@@ -3,7 +3,7 @@
 A responsive, accessible research experience (Phase III) where students and faculty imagine possible institutions for learning.
 Built from the designer brief v0.5 (13 November 2026). It is a research experience, not a university builder, a prediction or a ranking.
 
-Stack: React 19 + JavaScript (JSX), Vite, React Router (hash routes), plain CSS. Serverless functions in `api/` (Vercel), Upstash Redis over REST.
+Stack: React 19 + JavaScript (JSX), Vite, React Router (hash routes), plain CSS. Serverless functions in `api/` (Vercel), Postgres (Neon) over HTTP.
 Identity: taken from elespacio.net (off-black `#201e1f`, off-white `#f4efe8`, pink/orange/purple/green/blue/ochre, Bricolage Grotesque with Instrument Serif accents, pill buttons, sticker chips).
 
 ## Run it
@@ -41,7 +41,7 @@ src/
   export/        flatten.js: a session as long rows with provenance, plus CSV
   researcher/    sign-in, dashboard, metrics, exports, sample data
   styles/        tokens.css (identity), base.css, components.css, screens.css
-api/             session.js (sign-in), sessions.js (store/read), _auth.js, _db.js, _record.js (cleaning)
+api/             session.js (sign-in), sessions.js (save/read/delete), _auth.js, _db.js (Postgres), _record.js (cleaning)
 scripts/         check-flow.mjs
 ```
 
@@ -56,8 +56,11 @@ scripts/         check-flow.mjs
 
 ## Environment variables (set in the host, never in the repo)
 
-`RESEARCHER_USER`, `RESEARCHER_PASSWORD` (at least 8 characters), `SESSION_SECRET`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. See `.env.example`.
-Without the database variables the experience still works; the dashboard says nothing is connected and offers the sample preview.
+`RESEARCHER_USER`, `RESEARCHER_PASSWORD` (at least 8 characters), `SESSION_SECRET`, and `DATABASE_URL` (or `DATABASE_URL_POOLED` / `POSTGRES_URL`). See `.env.example`.
+The table is created on first use. Without a database the experience still works; the dashboard says nothing is connected and offers the sample preview.
+Run locally with an in-memory database: `LID_LOCAL_DB=1 npm run dev`.
+
+Data controls: participants can withdraw their own answers (footer, by session id plus code); researchers can delete a participant by code on the dashboard; saving is rate limited per IP.
 
 ## Feel and motion
 

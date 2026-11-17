@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { allocation, dimensions, educators, experience, funnel, inPeriod, overview, pct, profiles, tensions, writing } from "./metrics.js";
+import { STAGE_LABEL, allocation, dimensions, educators, experience, funnel, inPeriod, overview, pct, profiles, tensions, writing } from "./metrics.js";
 import BarList from "./BarList.jsx";
 import { useCountUp } from "../hooks/motion.js";
 import { download, responsesCsv, summaryCsv } from "./exports.js";
+import Dialog from "../components/Dialog.jsx";
 
 const n1 = (v) => (Number.isInteger(v) ? v : v.toFixed(1));
 
@@ -13,11 +14,12 @@ function Stat({ tone, num, suffix = "", decimals = 0, v, l, s }) {
   return <div className={`stat tone-${tone}`}><span className="v">{shown}</span><span className="l">{l}</span>{s && <span className="s">{s}</span>}</div>;
 }
 
-export default function Dashboard({ sessions, sample, offline, onSample, sampleOn }) {
+export default function Dashboard({ sessions, sample, offline, onSample, sampleOn, onDelete }) {
   const [days, setDays] = useState(0);
   const [route, setRoute] = useState("");
   const [only, setOnly] = useState("");
   const [kind, setKind] = useState("");
+  const [toDelete, setToDelete] = useState(null);
 
   const list = useMemo(() => inPeriod(sessions, days).filter((s) => (!route || s.route === route) && (!only || (only === "done" ? s.completedAt : !s.completedAt))), [sessions, days, route, only]);
   const o = useMemo(() => overview(list), [list]);
@@ -136,6 +138,31 @@ export default function Dashboard({ sessions, sample, offline, onSample, sampleO
         <div className="stack">{shownWr.length ? shownWr.map((w, i) => (<blockquote className="quote" key={i} style={{ margin: 0 }}><span className="k">{w.kind}</span><p>{w.text}</p><span className="c">{w.code} · {w.route === "free" ? "Imagine Freely" : "Configure"}</span></blockquote>)) : <p className="muted">Nothing written yet.</p>}</div>
         {wr.filter((w) => !kind || w.kind === kind).length > 60 && <p className="muted">Showing the first 60. Download the CSV for all of them.</p>}
       </section>
+      <section className="rsec" aria-labelledby="p-h">
+        <h2 id="p-h">Participants</h2>
+        <p className="hint">One row per participant code. Deleting removes everything stored for that code and cannot be undone.</p>
+        <div className="tbl-wrap">
+          <table className="tbl">
+            <caption>{list.length} participants in the current filter</caption>
+            <thead><tr><th scope="col">Code</th><th scope="col">Route</th><th scope="col">Reached</th><th scope="col">Started</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
+            <tbody>
+              {[...list].reverse().slice(0, 100).map((s) => (
+                <tr key={s.id}>
+                  <th scope="row">{s.code}</th>
+                  <td>{s.route === "free" ? "Imagine Freely" : "Configure"}</td>
+                  <td>{s.completedAt ? "Submitted" : STAGE_LABEL[s.furthest]}</td>
+                  <td className="num">{new Date(s.createdAt).toLocaleString()}</td>
+                  <td>{!sample && <button type="button" className="btn btn-ghost btn-small" onClick={() => setToDelete(s.code)} aria-label={`Delete ${s.code}`}>Delete</button>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {list.length > 100 && <p className="muted">Showing the latest 100. Use the filters to find others.</p>}
+      </section>
+      <Dialog open={Boolean(toDelete)} onClose={() => setToDelete(null)} title={`Delete ${toDelete}?`} actions={<button type="button" className="btn btn-soft" onClick={async () => { const c = toDelete; setToDelete(null); await onDelete(c); }}>Delete for good</button>}>
+        <p>This removes every answer, profile version and reflection stored for this participant code. It cannot be undone.</p>
+      </Dialog>
       <p className="hint">Counts about stages use every participant who started. Counts about answers use those who reached that part. Each participant is an anonymous code.</p>
     </div>
   );

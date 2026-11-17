@@ -16,3 +16,9 @@ export async function loadSessions() {
   if (!res.ok) throw new Error("Could not load the data.");
   return { auth: true, sessions: (await j(res)).sessions ?? [] };
 }
+
+export async function deleteByCode(code) {
+  const res = await fetch("/api/sessions", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ code }) });
+  if (!res.ok) throw new Error((await j(res)).error || "Could not delete.");
+  return (await j(res)).deleted ?? 0;
+}

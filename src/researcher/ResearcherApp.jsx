@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { loadSessions, signOut, whoami } from "./api.js";
+import { deleteByCode, loadSessions, signOut, whoami } from "./api.js";
 import { sampleSessions } from "./sample.js";
 import SignIn from "./SignIn.jsx";
 import Dashboard from "./Dashboard.jsx";
@@ -21,6 +21,7 @@ export default function ResearcherApp() {
 
   useEffect(() => { document.title = "Researcher view · Learning Institutions by Design"; whoami().then((u) => { setUser(u ?? null); if (u) load(); }); }, [load]);
 
+  const remove = async (code) => { try { await deleteByCode(code); await load(); } catch (e) { setErr(e.message); } };
   const out = async () => { await signOut(); setUser(null); setData({ sessions: [], offline: false }); };
 
   return (
@@ -35,7 +36,7 @@ export default function ResearcherApp() {
         {user && (
           <>
             {err && <p className="error" role="alert">{err}</p>}
-            <Dashboard sessions={sampleOn ? sample : data.sessions} sample={sampleOn} offline={data.offline && !sampleOn} sampleOn={sampleOn} onSample={() => setSampleOn((v) => !v)} />
+            <Dashboard sessions={sampleOn ? sample : data.sessions} sample={sampleOn} offline={data.offline && !sampleOn} sampleOn={sampleOn} onSample={() => setSampleOn((v) => !v)} onDelete={remove} />
           </>
         )}
       </main>

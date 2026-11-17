@@ -8,6 +8,7 @@ import { ACTIVITIES } from "../config/activities.js";
 import { usePointerGlow } from "../hooks/motion.js";
 import { stagesFor } from "../config/stages.js";
 import InfoDialog from "./InfoDialogs.jsx";
+import Dialog from "./Dialog.jsx";
 import { Check } from "./Icons.jsx";
 
 
@@ -37,11 +38,13 @@ const FOCUS = (p) => ["/imagine", "/experience", "/institution", "/profile", "/r
 
 // Page frame: top bar with help, stage rail, the screen, footer links. Also guards the route and manages focus and the page title.
 export default function Shell() {
-  const { session, update } = useSession();
+  const { session, update, reset } = useSession();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const mainRef = useRef(null);
   const [info, setInfo] = useState(null);
+  const [withdraw, setWithdraw] = useState(false);
+  const [note, setNote] = useState("");
   const stage = stageOfPath(pathname);
   usePointerGlow();
 
@@ -88,9 +91,18 @@ export default function Shell() {
         <button type="button" onClick={() => setInfo("data")}>AI and data</button>
         <button type="button" onClick={() => setInfo("access")}>Accessibility</button>
         {pathname !== "/" && <a href="/researcher">Researcher login</a>}
+        {session.route && <button type="button" onClick={() => setWithdraw(true)}>Withdraw my answers</button>}
         <span style={{ marginLeft: "auto" }}>Participant code {session.route ? session.code : "is given when you start"}</span>
       </footer>
       <InfoDialog which={info} onClose={() => setInfo(null)} />
+      <Dialog open={withdraw} onClose={() => setWithdraw(false)} title="Withdraw your answers?"
+        actions={<button type="button" className="btn btn-soft" onClick={async () => {
+          try { await fetch("/api/sessions", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: session.id, code: session.code }) }); } catch { /* the local copy is cleared either way */ }
+          setWithdraw(false); reset(); setNote("Your answers were removed."); navigate("/");
+        }}>Withdraw</button>}>
+        <p>This deletes everything stored for participant code {session.code}, here and with the research team, and clears this browser. It cannot be undone.</p>
+      </Dialog>
+      {note && <p className="toast" role="status" onAnimationEnd={() => setTimeout(() => setNote(""), 3500)}>{note}</p>}
     </div>
   );
 }
