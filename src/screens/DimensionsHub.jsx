@@ -5,19 +5,17 @@ import { HUB_OPTIONAL, HUB_REQUIRED } from "../config/dimensions.js";
 import { PATH } from "../flow/flow.js";
 import { dimState, requiredDimensionsDone } from "../flow/validate.js";
 import { uid } from "../state/model.js";
-import QBlock from "../components/QBlock.jsx";
 import ActionBar from "../components/ActionBar.jsx";
 import { Back, Primary } from "../components/Button.jsx";
-import { Check, Cross } from "../components/Icons.jsx";
+import { Arrow, Check, Cross } from "../components/Icons.jsx";
 import { TextInput } from "../components/Fields.jsx";
 import { useTitle } from "../hooks/useTitle.js";
 
 const STATE_LABEL = { done: "Done", started: "In progress", skipped: "Skipped", na: "Not applicable", todo: "Not started" };
 
-function Tile({ dim, state }) {
+function Tile({ dim, state, next }) {
   return (
-    <Link to={PATH.dimension(dim.id)} className={`tile tone-${dim.tone}${state === "todo" ? " is-todo" : ""}${dim.required ? "" : " optional"}`}>
-      <span className="n">{String(dim.n).padStart(2, "0")}</span>
+    <Link to={PATH.dimension(dim.id)} className={`tile tone-${dim.tone}${state === "todo" ? " is-todo" : ""}${dim.required ? "" : " optional"}${next ? " is-next" : ""}`}>
       <span className="t">{dim.short}</span>
       <span className="meta">
         <span className="badge">{dim.required ? "Required" : "Optional"}</span>
@@ -37,17 +35,24 @@ export default function DimensionsHub() {
   const optional = HUB_OPTIONAL;
   const left = required.filter((d) => dimState(session, d) !== "done").length;
   const ready = requiredDimensionsDone(session);
+  const nextDim = required.find((d) => dimState(session, d) !== "done") ?? null;
 
   const addDim = () => { if (!title.trim()) return; update((d) => { d.customDims.push({ id: uid("c"), title: title.trim().slice(0, 80), text: text.trim().slice(0, 600) }); }); setTitle(""); setText(""); };
 
   return (
     <>
       <div className="wrap">
-        <QBlock tone="orange" eyebrow="Configure Your Institution" title="Choose a dimension" hint="Six are required; six are optional. Work in any order, and come back to change anything. Your answers are kept." layered />
+        <header className="hubhead"><p className="eyebrow">Configure Your Institution</p><h1 className="title">Choose a dimension</h1><p className="hint">Six are required; six are optional. Work in any order. Your answers are kept.</p></header>
+        {nextDim && (
+          <div className="upnext" style={{ marginTop: "1.5rem" }}>
+            <div><p className="u-l">Up next</p><p className="u-t">{nextDim.short}</p></div>
+            <Link className="btn btn-primary" to={PATH.dimension(nextDim.id)}>{dimState(session, nextDim) === "started" ? "Continue" : "Start"}<span className="ico"><Arrow width="18" height="18" /></span></Link>
+          </div>
+        )}
         <div className="stack-lg" style={{ marginTop: "2.5rem" }}>
           <section className="group" aria-labelledby="req-h">
             <h2 id="req-h">Required <span className="muted">· {required.length - left} of {required.length} done</span></h2>
-            <div className="tiles">{required.map((d) => <Tile key={d.id} dim={d} state={dimState(session, d)} />)}</div>
+            <div className="tiles">{required.map((d) => <Tile key={d.id} dim={d} state={dimState(session, d)} next={nextDim?.id === d.id} />)}</div>
           </section>
           <section className="group" aria-labelledby="opt-h">
             <h2 id="opt-h">Optional <span className="muted">· skip any you like</span></h2>

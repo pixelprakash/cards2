@@ -25,7 +25,7 @@ export default function ActivityFrame({ id, question, hint, valid, has, needText
         <div className="qgrid">
           {children}
           {!meta.required && !has && (
-            <div className="later"><button type="button" className="btn btn-ghost" onClick={() => mark("skipped")}>Skip this activity</button></div>
+            <div className="later"><button type="button" className="btn-text" onClick={() => mark("skipped")}>Skip this activity</button></div>
           )}
         </div>
       </div>

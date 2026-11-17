@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { burst } from "../components/Confetti.js";
+import { haptic } from "../hooks/motion.js";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../state/SessionContext.jsx";
 import { SECTIONS, EMPTY_SECTION, profileText } from "../profile/organise.js";
@@ -21,6 +23,8 @@ export default function Done() {
   const navigate = useNavigate();
   const [msg, setMsg] = useState("");
   const [confirm, setConfirm] = useState(false);
+  useEffect(() => { const t = setTimeout(() => { burst({ x: innerWidth / 2, y: innerHeight * 0.3 }, { count: 70, spread: 1.7 }); haptic(30); }, 450); return () => clearTimeout(t); }, []);
+  const copyCode = async () => { try { await navigator.clipboard.writeText(session.code); setMsg("Code copied."); haptic(10); } catch { setMsg("Could not copy. Select the code and copy it instead."); } };
   const v = session.profile.versions.find((x) => x.id === session.profile.approvedVersionId) ?? latest(session.profile);
   const text = v ? profileText(v.sections) : "";
   const copy = async () => { try { await navigator.clipboard.writeText(text); setMsg("Copied."); } catch { setMsg("Could not copy. Select the text and copy it instead."); } };
@@ -28,7 +32,7 @@ export default function Done() {
     <div className="wrap narrow">
       <QBlock tone="green" eyebrow="Submitted" title="Thank you" question="Your institution has been submitted." hint="If you need to refer to your answers later, use your participant code." layered />
       <div className="stack-lg" style={{ marginTop: "2.5rem" }}>
-        <section className="panel" aria-labelledby="code-h"><h2 id="code-h" className="eyebrow">Your participant code</h2><p className="code">{session.code}</p></section>
+        <section className="panel" aria-labelledby="code-h"><h2 id="code-h" className="eyebrow">Your participant code</h2><button type="button" className="codebtn" onClick={copyCode} aria-label={`Participant code ${session.code}. Press to copy.`}><span className="code">{session.code}</span><span className="copy">Copy</span></button></section>
         {v && (
           <section className="sheet" aria-labelledby="prof-h">
             <h2 id="prof-h">Your institution</h2>

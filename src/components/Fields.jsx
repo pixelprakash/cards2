@@ -1,13 +1,17 @@
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
+import { useAutoGrow, finePointer } from "../hooks/motion.js";
 
-export function TextArea({ label, hint, value, onChange, rows, maxLength = 1200, placeholder, error, id: idProp, optional }) {
+export function TextArea({ label, hint, value, onChange, rows, maxLength = 1200, placeholder, error, id: idProp, optional, autoFocus }) {
   const auto = useId();
   const id = idProp ?? auto;
+  const ref = useRef(null);
+  useAutoGrow(ref, value);
+  useEffect(() => { if (autoFocus && finePointer()) ref.current?.focus({ preventScroll: true }); }, [autoFocus]);
   return (
     <div className={`field${error ? " has-error" : ""}`}>
       <label htmlFor={id}>{label}{optional && <span className="muted"> (optional)</span>}</label>
       {hint && <p className="hint" id={`${id}-h`}>{hint}</p>}
-      <textarea id={id} className="textarea" rows={rows} maxLength={maxLength} value={value} placeholder={placeholder}
+      <textarea ref={ref} id={id} className="textarea" rows={rows} maxLength={maxLength} value={value} placeholder={placeholder}
         aria-describedby={[hint ? `${id}-h` : "", error ? `${id}-e` : ""].filter(Boolean).join(" ") || undefined}
         aria-invalid={error ? true : undefined}
         onChange={(e) => onChange(e.target.value)} />

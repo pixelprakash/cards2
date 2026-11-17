@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useAutoGrow } from "../hooks/motion.js";
 import { useSession } from "../state/SessionContext.jsx";
 import { PATH } from "../flow/flow.js";
 import { SECTIONS, EMPTY_SECTION, inputHash } from "../profile/organise.js";
@@ -14,6 +15,7 @@ function Section({ sec, version, onEdit }) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
   const ref = useRef(null);
+  useAutoGrow(ref, text);
   const body = version.sections[sec.id];
   const edited = isEdited(version, sec.id);
   const start = () => { setText(body); setEditing(true); setTimeout(() => ref.current?.focus(), 30); };

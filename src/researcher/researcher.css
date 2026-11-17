@@ -36,3 +36,5 @@ details.more > summary:focus-visible { outline: 3px solid var(--focus); outline-
 .quote .c { color: var(--muted); font-size: 1rem; }
 .login { max-width: 30rem; display: grid; gap: 1rem; }
 .login .field > label { font-size: 1.1875rem; }
+
+.row .btn { white-space: normal; text-align: center; }

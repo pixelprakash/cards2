@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { Check } from "./Icons.jsx";
+import { haptic } from "../hooks/motion.js";
 
 // A bulleted list of choices. mode "multi" = checkboxes (optional max), "single" = one radio group.
 // Choices are researcher-provided; anything the participant added is passed as `custom` and shown after them.
@@ -9,6 +10,7 @@ export default function ChoiceList({ legend, options, custom = [], value, onChan
   const all = [...options.map((o) => ({ ...o })), ...custom.map((o) => ({ id: o.id, label: o.text, own: true }))];
 
   const toggle = (id) => {
+    haptic(6);
     if (mode === "single") return onChange([id]);
     onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
   };

@@ -9,7 +9,7 @@ export const DIMENSIONS = [
   {
     id: "governance", n: 1, short: "Governance", title: "Governance", required: true, kind: "choices", tone: "orange",
     question: "How would decisions be made?",
-    hint: "Think about where authority sits, who takes part, and how decisions might differ from one issue to another.",
+    hint: "Where authority sits, who takes part, and how it differs by issue.",
     choices: [
       c("central-leadership", "Central leadership"),
       c("collective-decisions", "Collective decisions"),
@@ -22,7 +22,7 @@ export const DIMENSIONS = [
   {
     id: "knowledge", n: 2, short: "Knowledge", title: "Organisation of knowledge", required: false, kind: "choices", tone: "blue",
     question: "How would different areas of knowledge come together?",
-    hint: "Select all that apply. This is about how knowledge is organised, not how it is taught.",
+    hint: "Select all that apply. This is about knowledge, not teaching.",
     choices: [
       c("disciplinary", "Disciplinary"),
       c("multidisciplinary", "Multidisciplinary", "Areas contribute side by side."),
@@ -35,7 +35,7 @@ export const DIMENSIONS = [
   {
     id: "locations", n: 3, short: "Locations", title: "Learning locations and settings", required: true, kind: "locations", tone: "green",
     question: "Where would learners spend most of their time learning?",
-    hint: "Choose one main setting, then up to two more. Online or offline is not a location; it describes an activity.",
+    hint: "Choose one main setting, then up to two more.",
     choices: [
       c("classrooms", "Classrooms or lecture spaces"),
       c("studios-labs", "Studios, workshops or laboratories"),
@@ -51,7 +51,7 @@ export const DIMENSIONS = [
   {
     id: "process", n: 4, short: "Learning Process", title: "Organisation of the learning process", required: true, kind: "choices", tone: "pink",
     question: "How would learning be organised?",
-    hint: "This is about structure across people and time, not about methods like debate or fieldwork. Select all that apply.",
+    hint: "Select all that apply. This is about structure, not methods like debate or fieldwork.",
     choices: [
       c("individual", "Individual learning"),
       c("cohort-group", "Cohort or group learning"),
@@ -66,7 +66,7 @@ export const DIMENSIONS = [
   {
     id: "membership", n: 5, short: "Membership", title: "Membership and participation", required: true, kind: "choices", tone: "sand",
     question: "Who can participate, and how would they belong?",
-    hint: "Select all that apply. These forms of belonging are not ranked and none is required.",
+    hint: "Select all that apply. None is ranked or required.",
     choices: [
       c("open", "Open participation"),
       c("formal-enrolment", "Formal enrolment"),
@@ -80,12 +80,12 @@ export const DIMENSIONS = [
   {
     id: "educators", n: 6, short: "Educators and Roles", title: "Educators and their roles", required: true, kind: "educators", tone: "purple",
     question: "Who contributes to learning, which group is most regularly involved, and what roles should the institution provide?",
-    hint: "Three short parts: who contributes, who is most regularly involved, and how you would weight the roles.",
+    hint: "Three short parts, one at a time.",
   },
   {
     id: "evaluation", n: 7, short: "Evaluation", title: "Evaluation of learning", required: false, kind: "choices", tone: "orange",
     question: "How would people know learning has taken place?",
-    hint: "Select all that apply. You can also mark the one you think matters most. No method is better than another here.",
+    hint: "Select all that apply. You can mark the one that matters most.",
     choices: [
       c("projects", "Projects"),
       c("portfolios", "Portfolios"),
@@ -102,7 +102,7 @@ export const DIMENSIONS = [
   {
     id: "credentials", n: 8, short: "Credentials", title: "Credentials and recognition", required: false, kind: "choices", tone: "blue",
     question: "How should people receive recognition for learning?",
-    hint: "Select all that apply. “No formal credential” is a real choice, not an absence of recognition.",
+    hint: "Select all that apply. “No formal credential” is a real choice.",
     choices: [
       c("degrees", "Degrees"),
       c("certificates", "Certificates"),
@@ -118,7 +118,7 @@ export const DIMENSIONS = [
   {
     id: "work", n: 9, short: "Learning and Work", title: "Relationship between learning and work", required: false, kind: "choices", tone: "green",
     question: "How should learning relate to work and everyday life?",
-    hint: "Select all that apply. Work includes paid, unpaid, care and ecological work, not only employment.",
+    hint: "Select all that apply. Work includes paid, unpaid, care and ecological work.",
     choices: [
       c("preparation-employment", "Preparation for employment"),
       c("alongside-employment", "Learning alongside employment"),
@@ -134,7 +134,7 @@ export const DIMENSIONS = [
   {
     id: "technology", n: 10, short: "Technology and AI", title: "Technology and AI in learning", required: false, kind: "choices", tone: "pink",
     question: "What role should technology and AI play, and in which activities?",
-    hint: "Select all that apply. These are functions, not a scale from low to high technology. Digital tools and AI are kept apart.",
+    hint: "Select all that apply. These are roles, not a scale from low to high.",
     choices: [
       c("minimal-none", "Minimal or no digital use"),
       c("communication-access", "Communication/access infrastructure"),
@@ -149,12 +149,12 @@ export const DIMENSIONS = [
   {
     id: "pedagogy", n: 11, short: "Pedagogical Methods", title: "Pedagogical approaches and learning methods", required: true, kind: "experience", tone: "sand",
     question: "What is one way learning could happen in your institution?",
-    hint: "Build one concrete learning experience in your own words. You can leave any prompt blank.",
+    hint: "Answer in your own words. Any question can stay blank.",
   },
   {
     id: "pathways", n: 12, short: "Time and Pathways", title: "Time and learning pathways", required: false, kind: "pathway", tone: "purple",
     question: "How would people enter, progress, pause, return and complete learning?",
-    hint: "Select all that apply, then, if you like, sketch the stages of a pathway. There is no fixed route or length.",
+    hint: "Select all that apply, then sketch stages if you like.",
     choices: [
       c("fixed-duration", "Fixed-duration programme"),
       c("open-ended", "Open-ended learning"),

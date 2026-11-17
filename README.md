@@ -59,6 +59,13 @@ scripts/         check-flow.mjs
 `RESEARCHER_USER`, `RESEARCHER_PASSWORD` (at least 8 characters), `SESSION_SECRET`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. See `.env.example`.
 Without the database variables the experience still works; the dashboard says nothing is connected and offers the sample preview.
 
+## Feel and motion
+
+Screens glide in the direction you are travelling; headings and cards rise in one after another; buttons press down like stickers; choices nudge, pop and draw their tick;
+sliders have a filled track, a big thumb and a value bubble; the points total celebrates when the last point is placed; steps slide when reordered; the entry screen has
+floating shapes, cards that lean toward the pointer and a soft glow that trails it; the finish screen throws confetti; a thin bar across the top shows overall progress.
+All of it lives in `src/styles/motion.css`, `src/hooks/motion.js` and `src/components/Confetti.js`, and all of it switches off for `prefers-reduced-motion`.
+
 ## Accessibility
 
 Keyboard operation everywhere; real labels; focus moves to the main area on each screen; visible focus rings; no colour-only meaning; 16px minimum text;

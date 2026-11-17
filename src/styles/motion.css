@@ -1,0 +1,142 @@
+/* ===== Motion and feel =====
+   Everything here is decoration or feedback. base.css switches animation and transition off for people who ask for reduced motion. */
+
+/* --- a soft glow that trails the pointer --- */
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(38rem 38rem at var(--gx, 50%) var(--gy, 18%), rgba(255, 171, 200, 0.10), transparent 70%); transition: background-position 0.3s linear; }
+
+/* --- overall progress, a thin bar across the top --- */
+.progress { position: fixed; inset: 0 0 auto 0; height: 5px; z-index: 60; background: transparent; pointer-events: none; }
+.progress i { display: block; height: 100%; width: calc(var(--prog, 0) * 100%); background: linear-gradient(90deg, var(--pink), var(--orange)); border-radius: 0 99px 99px 0; transition: width 0.9s var(--ease); }
+.saved { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--muted); font: 600 0.9375rem/1 var(--font); }
+.saved svg { width: 0.95rem; height: 0.95rem; color: var(--pink); animation: pop-in 0.5s var(--ease); }
+
+/* --- screens glide in, in the direction you are travelling --- */
+.screen { animation: screen-in 0.45s var(--ease) backwards; }
+.screen[data-dir="back"] { animation-name: screen-in-back; }
+@keyframes screen-in { from { opacity: 0; translate: 24px 0; } }
+@keyframes screen-in-back { from { opacity: 0; translate: -24px 0; } }
+@keyframes rise { from { opacity: 0; translate: 0 22px; } }
+@keyframes pop-in { 0% { scale: 0; rotate: -30deg; } 60% { scale: 1.25; } 100% { scale: 1; rotate: 0; } }
+@keyframes pop { 0% { scale: 1; } 35% { scale: 1.03; rotate: -0.4deg; } 100% { scale: 1; rotate: 0; } }
+@keyframes spin-in { from { rotate: -140deg; scale: 0.2; opacity: 0; } }
+@keyframes reveal { from { clip-path: inset(0 100% 0 0 round 1.25rem); } to { clip-path: inset(0 0 0 0 round 1.25rem); } }
+@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+@keyframes word-in { from { opacity: 0; translate: 0 0.6em; rotate: 2deg; } }
+@keyframes bump { 50% { scale: 1.12; } }
+
+/* headings and cards rise in one after another */
+.qblock { animation: reveal 0.5s var(--ease) backwards; }
+.qblock > * { animation: rise 0.5s var(--ease) backwards; }
+.qblock > :nth-child(1) { animation-delay: 0.08s; } .qblock > :nth-child(2) { animation-delay: 0.14s; } .qblock > :nth-child(3) { animation-delay: 0.2s; }
+.qgrid > *, .tiles > *, .exp > *, .profile > *, .stack-lg > *, .routes > * { animation: rise 0.5s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 40ms + 0.12s); }
+:is(.qgrid, .tiles, .exp, .profile, .stack-lg, .routes) > :nth-child(1) { --i: 0; } :is(.qgrid, .tiles, .exp, .profile, .stack-lg, .routes) > :nth-child(2) { --i: 1; }
+:is(.qgrid, .tiles, .exp, .profile, .stack-lg, .routes) > :nth-child(3) { --i: 2; } :is(.qgrid, .tiles, .exp, .profile, .stack-lg, .routes) > :nth-child(4) { --i: 3; }
+:is(.qgrid, .tiles, .exp, .profile, .stack-lg, .routes) > :nth-child(5) { --i: 4; } :is(.qgrid, .tiles, .exp, .profile, .stack-lg, .routes) > :nth-child(6) { --i: 5; }
+:is(.qgrid, .tiles, .exp, .profile, .stack-lg, .routes) > :nth-child(n+7) { --i: 6; }
+
+/* block decoration */
+.qblock { overflow: hidden; }
+.qblock.layered { overflow: visible; box-shadow: 0.7rem -0.7rem 0 var(--pink); }
+.deco { position: absolute; pointer-events: none; }
+
+/* --- buttons: tactile, they press down --- */
+.btn { position: relative; }
+.btn-primary { box-shadow: 0 4px 0 #c46a8b; }
+.btn-soft { box-shadow: 0 4px 0 #b0a79a; }
+.btn-primary:hover, .btn-soft:hover { translate: 0 -2px; box-shadow: 0 6px 0 #c46a8b; }
+.btn-soft:hover { box-shadow: 0 6px 0 #b0a79a; }
+.btn-primary:active, .btn-soft:active { translate: 0 3px; box-shadow: 0 1px 0 #c46a8b; transition-duration: 0.06s; }
+.btn-soft:active { box-shadow: 0 1px 0 #b0a79a; }
+.btn-primary[aria-disabled="true"], .btn-primary[aria-disabled="true"]:hover, .btn-primary[aria-disabled="true"]:active { box-shadow: none; translate: 0; }
+.btn-ghost:active { scale: 0.97; transition-duration: 0.06s; }
+.btn-primary .ico svg { transition: translate 0.35s var(--ease); }
+.btn-primary:hover .ico { rotate: 0deg; } .btn-primary:hover .ico svg { translate: 3px 0; }
+.iconbtn { transition: background-color 0.25s var(--ease), color 0.25s var(--ease), scale 0.2s var(--ease), border-color 0.25s var(--ease); }
+.iconbtn:active:not([aria-disabled="true"]) { scale: 0.88; }
+
+/* --- choices: they nudge, then pop when picked, and the tick draws itself --- */
+.choice label { transition: background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), translate 0.25s var(--ease); }
+.choice input:hover:not(:disabled) + label { translate: 4px 0; }
+.choice input:checked + label { animation: pop 0.4s var(--ease); }
+.choice label .mark { transition: background-color 0.25s var(--ease), border-color 0.25s var(--ease), scale 0.3s var(--ease); }
+.choice input:checked + label .mark { scale: 1.1; }
+.choice label .mark svg path { stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset 0.4s var(--ease) 0.05s; }
+.choice input:checked + label .mark svg path { stroke-dashoffset: 0; }
+.chips .choice input:hover:not(:disabled) + label { translate: 0 -2px; }
+
+/* --- fields --- */
+.input, .textarea, .select { transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease), translate 0.3s var(--ease); }
+.input:focus, .textarea:focus, .select:focus { box-shadow: 0 0 0 6px rgba(255, 171, 200, 0.28); }
+.textarea { overflow: hidden; resize: none; transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease), height 0.15s ease-out; }
+.step { animation: rise 0.45s var(--ease) backwards; }
+.step::before { transition: scale 0.3s var(--ease), rotate 0.3s var(--ease); }
+.step:focus-within::before { scale: 1.15; rotate: -8deg; }
+.tag { animation: pop-in 0.4s var(--ease); }
+
+/* --- sliders: filled track, big thumb, value bubble --- */
+.slider { --thumb: 1.9rem; --fill: var(--pink); position: relative; width: 100%; padding-top: 1.9rem; }
+.slider.tone-orange { --fill: var(--orange); } .slider.tone-purple { --fill: var(--purple); } .slider.tone-blue { --fill: var(--blue); }
+.slider .range { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: var(--thumb); margin: 0; background: none; cursor: pointer; touch-action: pan-y; }
+.slider .range::-webkit-slider-runnable-track { height: 0.7rem; border-radius: 99px; background: linear-gradient(to right, var(--fill) calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--p) / 100), rgba(244, 239, 232, 0.3) 0); }
+.slider .range::-moz-range-track { height: 0.7rem; border-radius: 99px; background: rgba(244, 239, 232, 0.3); }
+.slider .range::-moz-range-progress { height: 0.7rem; border-radius: 99px; background: var(--fill); }
+.slider .range::-webkit-slider-thumb { -webkit-appearance: none; width: var(--thumb); height: var(--thumb); margin-top: calc((0.7rem - var(--thumb)) / 2); border-radius: 50%; background: var(--paper); border: 4px solid var(--ink); box-shadow: 0 0 0 3px var(--fill), 0 4px 10px rgba(0, 0, 0, 0.35); transition: scale 0.25s var(--ease); }
+.slider .range::-moz-range-thumb { width: calc(var(--thumb) - 8px); height: calc(var(--thumb) - 8px); border-radius: 50%; background: var(--paper); border: 4px solid var(--ink); box-shadow: 0 0 0 3px var(--fill), 0 4px 10px rgba(0, 0, 0, 0.35); }
+.slider .range:hover::-webkit-slider-thumb, .slider .range:active::-webkit-slider-thumb { scale: 1.18; }
+.slider .range:focus-visible { outline: 3px solid var(--focus); outline-offset: 6px; border-radius: 99px; }
+.slider .bubble { position: absolute; top: 0; left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--p) / 100); translate: -50% 0; min-width: 2.4rem; padding: 0.15rem 0.5rem; border-radius: 0.6rem; background: var(--fill); color: var(--ink); font: 700 0.9375rem/1.4 var(--font); text-align: center; opacity: 0; scale: 0.6; transform-origin: 50% 100%; transition: opacity 0.2s var(--ease), scale 0.3s var(--ease); pointer-events: none; }
+.slider:hover .bubble, .slider:focus-within .bubble, .slider:active .bubble { opacity: 1; scale: 1; }
+
+/* --- the points total fills up, and celebrates at 100 --- */
+.alloc-total { transition: background-color 0.4s var(--ease), scale 0.3s var(--ease); }
+.alloc-total.is-ok { animation: bump 0.5s var(--ease); }
+.alloc-row { transition: background-color 0.25s var(--ease); border-radius: 0.8rem; }
+.alloc-row:focus-within { background: rgba(244, 239, 232, 0.06); }
+.rest { all: unset; cursor: pointer; font: 700 0.9375rem/1 var(--font); padding: 0.55rem 0.85rem; border-radius: 99px; border: 2px dashed var(--line); color: var(--fg); min-height: 2.75rem; box-sizing: border-box; display: inline-flex; align-items: center; transition: background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), scale 0.2s var(--ease); }
+.rest:hover { background: var(--pink); color: var(--ink); border-color: var(--pink); }
+.rest:active { scale: 0.94; }
+.rest:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+/* --- paired tension: the split shows the balance --- */
+.split { display: flex; height: 3.25rem; border-radius: 99px; overflow: hidden; background: var(--surface); box-shadow: 0 0 0 2px var(--line); }
+.split > span { display: flex; align-items: center; padding-inline: 1rem; font: 700 1.125rem/1 var(--font); color: var(--ink); min-width: 0; transition: flex-basis 0.35s var(--ease); white-space: nowrap; overflow: hidden; }
+.split > .a { background: var(--pink); justify-content: flex-start; } .split > .b { background: var(--purple); justify-content: flex-end; }
+
+/* --- tiles --- */
+.tile { transition: translate 0.4s var(--ease), rotate 0.4s var(--ease), box-shadow 0.4s var(--ease); box-shadow: 0 0 0 transparent; }
+.tile:hover { box-shadow: 0 10px 0 rgba(0, 0, 0, 0.28); }
+.tile .st svg { animation: pop-in 0.5s var(--ease); }
+
+
+/* --- entry: floating shapes, headline words, tilting cards --- */
+.hero { position: relative; isolation: isolate; overflow-x: clip; }
+.hero .deco { z-index: -1; transition: translate 0.4s ease-out; opacity: 0.9; }
+.d1 { right: 2%; top: 4%; width: clamp(4rem, 9vw, 8rem); color: var(--pink); translate: calc(var(--mx, 0) * -26px) calc(var(--my, 0) * -18px); animation: spin-in 1.2s var(--ease) 0.4s backwards; }
+.d2 { right: 16%; top: 36%; width: clamp(3rem, 7vw, 6rem); color: var(--purple); translate: calc(var(--mx, 0) * 20px) calc(var(--my, 0) * 14px); animation: spin-in 1.2s var(--ease) 0.55s backwards; }
+.d3 { right: 4%; top: 52%; width: clamp(2.5rem, 5vw, 4.5rem); color: var(--orange); translate: calc(var(--mx, 0) * -14px) calc(var(--my, 0) * 22px); animation: spin-in 1.2s var(--ease) 0.7s backwards; }
+.d4 { right: 24%; top: 3%; width: clamp(5rem, 10vw, 8.5rem); color: var(--blue); translate: calc(var(--mx, 0) * 16px) calc(var(--my, 0) * -12px); animation: word-in 1s var(--ease) 0.8s backwards; }
+@media (max-width: 760px) { .d2, .d4 { display: none; } .d1 { top: 1%; right: 4%; width: 3.5rem; } .d3 { top: 6%; right: 22%; width: 2.2rem; } }
+.word { display: inline-block; animation: word-in 0.9s var(--ease) backwards; animation-delay: calc(var(--w, 0) * 110ms + 0.1s); }
+.route { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(0); transition: transform 0.35s var(--ease), translate 0.4s var(--ease); overflow: hidden; }
+.route:hover { translate: 0; rotate: 0deg; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px); }
+.route::after { content: ""; position: absolute; inset: 0; background: radial-gradient(22rem circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.35), transparent 60%); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.route:hover::after { opacity: 1; }
+.route .go i { transition: rotate 0.4s var(--ease), scale 0.3s var(--ease); }
+.route:hover .go i { rotate: -45deg; scale: 1.12; }
+
+/* --- dialog and toast --- */
+dialog.dlg[open] { animation: rise 0.45s var(--ease); }
+dialog.dlg::backdrop { animation: fade 0.3s ease; }
+@keyframes fade { from { opacity: 0; } }
+.toast { animation: rise 0.4s var(--ease); }
+
+/* --- done: the code is a button, because copying is the next thing people do --- */
+.codebtn { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
+.codebtn:focus-visible { outline: 3px solid var(--focus); outline-offset: 6px; border-radius: 12px; }
+.codebtn .copy { font: 700 0.9375rem/1 var(--font); padding: 0.55rem 0.9rem; border-radius: 99px; background: var(--paper); color: var(--ink); transition: background-color 0.25s var(--ease), scale 0.2s var(--ease); }
+.codebtn:hover .copy { background: var(--pink); } .codebtn:active .copy { scale: 0.94; }
+
+/* --- researcher: bars grow, figures count up --- */
+.bl .track i { transition: width 1s var(--ease); transition-delay: calc(var(--i, 0) * 50ms); }
+
+@media (max-width: 640px) { .saved .saved-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }

@@ -3,7 +3,6 @@ import { useSession } from "../state/SessionContext.jsx";
 import { ACTIVITIES } from "../config/activities.js";
 import { PATH } from "../flow/flow.js";
 import { activityState, allocationDone } from "../flow/validate.js";
-import QBlock from "../components/QBlock.jsx";
 import ActionBar from "../components/ActionBar.jsx";
 import { Back, Primary } from "../components/Button.jsx";
 import { Check } from "../components/Icons.jsx";
@@ -19,7 +18,7 @@ export default function ActivitiesHub() {
   return (
     <>
       <div className="wrap">
-        <QBlock tone="green" eyebrow="Shared activities" title="A few things everyone does" hint="Resource allocation is required. The rest are optional and can be done in any order, or skipped." layered />
+        <header className="hubhead"><p className="eyebrow">Shared activities</p><h1 className="title">A few things everyone does</h1><p className="hint">Resource allocation is required. The rest are optional, in any order.</p></header>
         <div className="tiles" style={{ marginTop: "2.5rem" }}>
           {ACTIVITIES.map((a) => {
             const st = activityState(session, a.id);

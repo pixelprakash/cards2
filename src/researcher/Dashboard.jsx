@@ -1,11 +1,17 @@
 import { useMemo, useState } from "react";
 import { allocation, dimensions, educators, experience, funnel, inPeriod, overview, pct, profiles, tensions, writing } from "./metrics.js";
 import BarList from "./BarList.jsx";
+import { useCountUp } from "../hooks/motion.js";
 import { download, responsesCsv, summaryCsv } from "./exports.js";
 
 const n1 = (v) => (Number.isInteger(v) ? v : v.toFixed(1));
 
-function Stat({ tone, v, l, s }) { return <div className={`stat tone-${tone}`}><span className="v">{v}</span><span className="l">{l}</span>{s && <span className="s">{s}</span>}</div>; }
+// A headline figure that counts up. Pass num (with optional suffix and decimals), or v for text.
+function Stat({ tone, num, suffix = "", decimals = 0, v, l, s }) {
+  const n = useCountUp(num ?? 0);
+  const shown = num == null ? v : `${n.toFixed(decimals)}${suffix}`;
+  return <div className={`stat tone-${tone}`}><span className="v">{shown}</span><span className="l">{l}</span>{s && <span className="s">{s}</span>}</div>;
+}
 
 export default function Dashboard({ sessions, sample, offline, onSample, sampleOn }) {
   const [days, setDays] = useState(0);
@@ -50,12 +56,12 @@ export default function Dashboard({ sessions, sample, offline, onSample, sampleO
       <section className="rsec" aria-labelledby="o-h">
         <h2 id="o-h">Overview</h2>
         <div className="stats">
-          <Stat tone="pink" v={o.started} l="Started" s="chose a route" />
-          <Stat tone="orange" v={o.completed} l="Submitted" s={`${o.completionRate}% of those who started`} />
-          <Stat tone="blue" v={o.completed ? `${n1(Math.round(o.medianMinutes * 10) / 10)} min` : "–"} l="Median time to submit" />
-          <Stat tone="purple" v={`${pct(o.free, o.started)}%`} l="Imagine Freely" s={`${o.free} free, ${o.configure} configured`} />
-          <Stat tone="sand" v={`${pct(o.approved, o.withProfile)}%`} l="Approved their profile" s={`${o.approved} of ${o.withProfile} who saw one`} />
-          <Stat tone="green" v={pct(o.edited, o.withProfile) + "%"} l="Edited the profile" s={o.meanDrafts ? `${n1(Math.round(o.meanDrafts * 10) / 10)} drafts each on average` : undefined} />
+          <Stat tone="pink" num={o.started} l="Started" s="chose a route" />
+          <Stat tone="orange" num={o.completed} l="Submitted" s={`${o.completionRate}% of those who started`} />
+          <Stat tone="blue" {...(o.completed ? { num: o.medianMinutes, suffix: " min", decimals: 1 } : { v: "–" })} l="Median time to submit" />
+          <Stat tone="purple" num={pct(o.free, o.started)} suffix="%" l="Imagine Freely" s={`${o.free} free, ${o.configure} configured`} />
+          <Stat tone="sand" num={pct(o.approved, o.withProfile)} suffix="%" l="Approved their profile" s={`${o.approved} of ${o.withProfile} who saw one`} />
+          <Stat tone="green" num={pct(o.edited, o.withProfile)} suffix="%" l="Edited the profile" s={o.meanDrafts ? `${n1(Math.round(o.meanDrafts * 10) / 10)} drafts each on average` : undefined} />
         </div>
       </section>
 

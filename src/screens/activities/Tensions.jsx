@@ -36,15 +36,6 @@ export default function Tensions() {
   return (
     <ActivityFrame id="tensions" question="Which tensions would your institution have to live with?" hint="Choose up to three. You do not have to pick a winner: a tension can stay a tension." has={a.selected.length > 0} valid>
       <ChoiceList legend={`Choose up to ${MAX_TENSIONS}`} hint={`${a.selected.length} of ${MAX_TENSIONS} chosen`} options={options} custom={customOpts} value={ids} max={MAX_TENSIONS} onChange={setIds} columns />
-      <section className="panel" aria-labelledby="own-t">
-        <h2 id="own-t" style={{ font: "700 1.25rem/1.2 var(--font)" }}>Add your own tension</h2>
-        <div className="poles">
-          <TextInput label="One side" value={pa} onChange={setPa} maxLength={60} />
-          <TextInput label="The other side" value={pb} onChange={setPb} maxLength={60} />
-        </div>
-        <div><button type="button" className="btn btn-soft" onClick={addOwn} aria-disabled={full || undefined}>Add this tension</button>{full && <span className="hint" style={{ marginLeft: "0.8rem" }}>You have chosen three.</span>}</div>
-      </section>
-
       {a.selected.map((s) => (
         <section key={s.id} className="tension" aria-label={`${s.a} and ${s.b}`}>
           <h2 style={{ font: "700 1.3125rem/1.25 var(--font)" }}>{s.a} <span className="muted">and</span> {s.b}</h2>
@@ -55,6 +46,18 @@ export default function Tensions() {
           <TextArea label="Say more about this tension" optional rows={3} value={s.note} onChange={(v) => patch(s.id, { note: v })} />
         </section>
       ))}
+      <details className="more">
+        <summary>Add your own tension</summary>
+      <section className="panel" aria-labelledby="own-t" style={{ marginTop: "0.8rem" }}>
+        <h2 id="own-t" style={{ font: "700 1.25rem/1.2 var(--font)" }}>Add your own tension</h2>
+        <div className="poles">
+          <TextInput label="One side" value={pa} onChange={setPa} maxLength={60} />
+          <TextInput label="The other side" value={pb} onChange={setPb} maxLength={60} />
+        </div>
+        <div><button type="button" className="btn btn-soft" onClick={addOwn} aria-disabled={full || undefined}>Add this tension</button>{full && <span className="hint" style={{ marginLeft: "0.8rem" }}>You have chosen three.</span>}</div>
+      </section>
+
+      </details>
     </ActivityFrame>
   );
 }

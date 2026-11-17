@@ -11,7 +11,7 @@ import { dimOf } from "../state/model.js";
 
 // Shared frame for every dimension: the coloured heading, the body, skip controls (optional dimensions only),
 // and Previous / Next to move through the twelve in order. Moving on keeps what was entered; nothing is erased.
-export default function DimensionFrame({ dim, children, needText }) {
+export default function DimensionFrame({ dim, children, needText, parts }) {
   useTitle(dim.title);
   const { session, update } = useSession();
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ export default function DimensionFrame({ dim, children, needText }) {
   return (
     <>
       <div className="wrap narrow">
-        <div style={{ marginBottom: "0.9rem" }}><TextButton onClick={() => navigate(PATH.dimensions)}>← All dimensions</TextButton></div>
+        {prev && <div style={{ marginBottom: "0.9rem" }}><TextButton onClick={() => navigate(PATH.dimensions)}>← All dimensions</TextButton></div>}
         <QBlock tone={dim.tone} eyebrow={dimEyebrow(dim)} badge={dim.required ? "Required" : "Optional"} title={dim.title} question={dim.question} hint={dim.hint} />
         {d.status === "skipped" && <p className="hint" style={{ marginTop: "1rem" }}>You skipped this earlier. Add an answer, or leave it skipped.</p>}
         {d.status === "na" && <p className="hint" style={{ marginTop: "1rem" }}>You marked this as not applicable to your institution. Add an answer to change that.</p>}
@@ -41,14 +41,20 @@ export default function DimensionFrame({ dim, children, needText }) {
           {children}
           {!dim.required && !has && (
             <div className="later">
-              <button type="button" className="btn btn-ghost" onClick={() => mark("skipped")}>Skip this dimension</button>
-              <button type="button" className="btn btn-ghost" onClick={() => mark("na")}>Not applicable to my institution</button>
+              <button type="button" className="btn-text" onClick={() => mark("skipped")}>Skip this dimension</button>
+              <button type="button" className="btn-text" onClick={() => mark("na")}>Not applicable to my institution</button>
             </div>
           )}
         </div>
       </div>
-      <ActionBar back={<Back to={prevPath} onClick={save}>{prev ? "Previous" : "All dimensions"}</Back>} need={dim.required && !valid ? `${needText} You can move on and come back.` : undefined}>
-        <Primary to={nextPath} onClick={save}>{next ? "Next" : "Finish dimensions"}</Primary>
+      <ActionBar
+        back={parts && parts.index > 0
+          ? <Back onClick={parts.prev}>Previous part</Back>
+          : <Back to={prevPath} onClick={save}>{prev ? "Previous" : "All dimensions"}</Back>}
+        need={parts && parts.index < parts.count - 1 ? parts.need : dim.required && !valid ? `${needText} You can move on and come back.` : undefined}>
+        {parts && parts.index < parts.count - 1
+          ? <Primary onClick={parts.next} disabled={!parts.ready} why={() => {}}>Next part</Primary>
+          : <Primary to={nextPath} onClick={save}>{next ? "Next" : "Finish dimensions"}</Primary>}
       </ActionBar>
     </>
   );

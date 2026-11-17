@@ -17,9 +17,9 @@ export default function ImagineFreely() {
   return (
     <>
       <div className="wrap narrow">
-        <QBlock tone="pink" eyebrow="Imagine Freely" title="What might a different institution for learning look like?" hint="Write as much or as little as you like. You can come back and edit this later." />
+        <QBlock tone="pink" eyebrow="Imagine Freely" title="What might a different institution for learning look like?" hint="As much or as little as you like. You can edit it later." />
         <div className="qgrid">
-          <TextArea id="free-text" label="Your description" rows={9} maxLength={2000} value={session.free.text}
+          <TextArea autoFocus id="free-text" label="Your description" rows={9} maxLength={2000} value={session.free.text}
             onChange={(v) => update((d) => { d.free.text = v; })}
             hint="This description is required on this route and can be edited later."
             error={tried && !ok ? "Please write a few words about your idea to continue." : undefined} />

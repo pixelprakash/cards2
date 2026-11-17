@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useDim } from "../../hooks/useDim.js";
 import { uid } from "../../state/model.js";
 import { CONTRIBUTOR_GROUPS, EDUCATOR_ROLES, NO_SINGLE_GROUP, NO_SINGLE_GROUP_LABEL } from "../../config/dimensions.js";
@@ -7,8 +8,10 @@ import PointsAllocator from "../../components/PointsAllocator.jsx";
 import DimensionFrame from "../DimensionFrame.jsx";
 
 // Frozen three-part interaction: A who contributes, B which group is most regularly involved, C roles (100 points).
+// Shown one part at a time, so there is only ever one thing to decide.
 export default function EducatorsDimension({ dim }) {
   const [d, edit] = useDim(dim.id);
+  const [part, setPart] = useState(0);
   const chosen = [
     ...CONTRIBUTOR_GROUPS.filter((g) => d.contributors.picks.includes(g.id)),
     ...d.contributors.custom.map((g) => ({ id: g.id, label: g.text })),
@@ -19,28 +22,48 @@ export default function EducatorsDimension({ dim }) {
   const setRole = (id, n) => edit((x) => { x.roles.values[id] = n; });
   const spread = () => edit((x) => { const rows = roleRows.map((r) => r.id); const base = Math.floor(100 / rows.length); let extra = 100 - base * rows.length; rows.forEach((id) => { x.roles.values[id] = base + (extra-- > 0 ? 1 : 0); }); });
 
+  const hasGroups = d.contributors.picks.length + d.contributors.custom.length > 0;
+  const parts = {
+    index: part, count: 3,
+    prev: () => setPart((p) => Math.max(0, p - 1)),
+    next: () => setPart((p) => Math.min(2, p + 1)),
+    ready: part === 0 ? hasGroups : part === 1 ? d.regular != null : true,
+    need: part === 0 ? "Choose at least one group to go on." : "Choose one to go on.",
+  };
+
   return (
-    <DimensionFrame dim={dim} needText="Complete all three parts: contributors, the most regular group, and 100 points across roles.">
-      <section className="group" aria-labelledby="ed-a">
-        <h2 id="ed-a">Part A · Who would contribute to learning?</h2>
-        <ChoiceList legend="Build the teaching community. Select any groups, as many as you like." options={CONTRIBUTOR_GROUPS} value={d.contributors.picks} columns
-          onChange={(v) => edit((x) => { x.contributors.picks = v; if (x.regular && x.regular !== NO_SINGLE_GROUP && !v.includes(x.regular) && !x.contributors.custom.some((c) => c.id === x.regular)) x.regular = null; })} />
-        <AddOwn label="Add your own group" placeholder="Another group who would contribute" onAdd={(t) => edit((x) => { x.contributors.custom.push({ id: uid("c"), text: t }); })} />
-        <OwnTags items={d.contributors.custom} onRemove={(id) => edit((x) => { x.contributors.custom = x.contributors.custom.filter((c) => c.id !== id); if (x.regular === id) x.regular = null; })} />
-      </section>
+    <DimensionFrame dim={dim} needText="Finish all three parts: contributors, the most regular group, and 100 points across roles." parts={parts}>
+      <p className="parts" aria-live="polite">
+        <span>Part {part + 1} of 3</span>
+        <span className="dots" aria-hidden="true">{[0, 1, 2].map((i) => <i key={i} className={i === part ? "on" : i < part ? "done" : ""} />)}</span>
+      </p>
 
-      <section className="group" aria-labelledby="ed-b">
-        <h2 id="ed-b">Part B · Which group would be most regularly involved in learning?</h2>
-        <ChoiceList legend="Choose one" options={regularOptions} value={d.regular ? [d.regular] : []} mode="single" onChange={([v]) => edit((x) => { x.regular = v; })} />
-      </section>
+      {part === 0 && (
+        <section className="group" aria-labelledby="ed-a">
+          <h2 id="ed-a">Who would contribute to learning?</h2>
+          <ChoiceList legend="Select any groups, as many as you like" options={CONTRIBUTOR_GROUPS} value={d.contributors.picks} columns
+            onChange={(v) => edit((x) => { x.contributors.picks = v; if (x.regular && x.regular !== NO_SINGLE_GROUP && !v.includes(x.regular) && !x.contributors.custom.some((c) => c.id === x.regular)) x.regular = null; })} />
+          <AddOwn label="Add your own group" placeholder="Another group who would contribute" onAdd={(t) => edit((x) => { x.contributors.custom.push({ id: uid("c"), text: t }); })} />
+          <OwnTags items={d.contributors.custom} onRemove={(id) => edit((x) => { x.contributors.custom = x.contributors.custom.filter((c) => c.id !== id); if (x.regular === id) x.regular = null; })} />
+        </section>
+      )}
 
-      <section className="group" aria-labelledby="ed-c">
-        <h2 id="ed-c">Part C · What roles should your institution provide?</h2>
-        <PointsAllocator rows={roleRows} values={d.roles.values} onChange={setRole} onSpread={spread} onClear={() => edit((x) => { x.roles.values = {}; })}
-          onRemove={(id) => edit((x) => { x.roles.custom = x.roles.custom.filter((r) => r.id !== id); delete x.roles.values[id]; })}
-          note="Share 100 points across the roles. The points show how much weight the institution gives each role, not an individual educator's time. Zero is fine." />
-        <AddOwn label="Add a role" placeholder="Another role the institution should provide" onAdd={(t) => edit((x) => { x.roles.custom.push({ id: uid("c"), text: t }); })} />
-      </section>
+      {part === 1 && (
+        <section className="group" aria-labelledby="ed-b">
+          <h2 id="ed-b">Which group would be most regularly involved in learning?</h2>
+          <ChoiceList legend="Choose one" options={regularOptions} value={d.regular ? [d.regular] : []} mode="single" onChange={([v]) => edit((x) => { x.regular = v; })} />
+        </section>
+      )}
+
+      {part === 2 && (
+        <section className="group" aria-labelledby="ed-c">
+          <h2 id="ed-c">What roles should your institution provide?</h2>
+          <PointsAllocator rows={roleRows} values={d.roles.values} onChange={setRole} onSpread={spread} onClear={() => edit((x) => { x.roles.values = {}; })}
+            onRemove={(id) => edit((x) => { x.roles.custom = x.roles.custom.filter((r) => r.id !== id); delete x.roles.values[id]; })}
+            note="Share 100 points across the roles. Points show how much weight the institution gives each role, not an individual educator's time. Zero is fine." />
+          <AddOwn label="Add a role" placeholder="Another role the institution should provide" onAdd={(t) => edit((x) => { x.roles.custom.push({ id: uid("c"), text: t }); })} />
+        </section>
+      )}
     </DimensionFrame>
   );
 }

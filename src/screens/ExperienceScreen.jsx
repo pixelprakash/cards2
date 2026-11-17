@@ -16,7 +16,7 @@ export default function ExperienceScreen() {
   return (
     <>
       <div className="wrap narrow">
-        <QBlock tone="sand" eyebrow="Imagine Freely · Your idea" title="Build one learning experience" hint="Use the prompts to describe one concrete way learning could happen in your institution. They are not a list of methods to pick from. Write, add steps, rearrange them, and leave any prompt blank." />
+        <QBlock tone="sand" eyebrow="Imagine Freely · Your idea" title="Build one learning experience" hint="Describe one way learning could happen. Answer in your own words; any question can stay blank." />
         <div className="qgrid"><ExperienceBuilder /></div>
       </div>
       <ActionBar back={<Back to={PATH.imagine} />} need={has ? undefined : "All prompts are optional. You can continue without answering."}>

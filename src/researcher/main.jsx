@@ -6,5 +6,6 @@ import "../styles/base.css";
 import "../styles/components.css";
 import "../styles/screens.css";
 import "./researcher.css";
+import "../styles/motion.css";
 
 createRoot(document.getElementById("root")).render(<StrictMode><ResearcherApp /></StrictMode>);
