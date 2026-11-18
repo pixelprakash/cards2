@@ -106,3 +106,26 @@ export function inPeriod(sessions, days) {
   return sessions.filter((s) => Date.parse(s.createdAt) >= cut);
 }
 export { pct, mean, minutes };
+
+// Starts and submissions per day, oldest first, for the small chart on the overview.
+export function daily(sessions, days = 14) {
+  const out = []; const today = new Date(); today.setHours(0, 0, 0, 0);
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const day = sessions.filter((s) => new Date(s.createdAt).toDateString() === d.toDateString());
+    out.push({ label: d.toLocaleDateString(undefined, { day: "numeric", month: "short" }), started: day.length, done: day.filter((s) => s.completedAt).length });
+  }
+  return out;
+}
+
+// Familiar practices: how often each was kept, changed, left behind, combined or added.
+export function rethink(sessions) {
+  const by = new Map();
+  sessions.forEach((s) => {
+    const r = s.activities?.rethink; if (!r) return;
+    const add = (key, label, action) => { if (!action) return; const row = by.get(key) ?? { label, keep: 0, change: 0, leave: 0, combine: 0, add: 0 }; row[action]++; by.set(key, row); };
+    Object.entries(r.items ?? {}).forEach(([id, v]) => add(id, id.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase()), v.action));
+    (r.custom ?? []).forEach((c) => add(`own:${c.text}`, `${c.text} (added)`, c.action));
+  });
+  return [...by.values()].sort((a, b) => (b.keep + b.change + b.leave + b.combine + b.add) - (a.keep + a.change + a.leave + a.combine + a.add));
+}

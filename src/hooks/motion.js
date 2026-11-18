@@ -62,14 +62,3 @@ export function useTilt(ref, { max = 7 } = {}) {
     return () => { el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", leave); };
   }, [ref, max]);
 }
-
-// A faint pink glow that trails the pointer across the page. Fine pointers only.
-export function usePointerGlow() {
-  useEffect(() => {
-    if (reducedMotion() || !finePointer()) return undefined;
-    let raf = 0; let x = 50; let y = 20;
-    const move = (e) => { x = (e.clientX / innerWidth) * 100; y = (e.clientY / innerHeight) * 100; if (!raf) raf = requestAnimationFrame(() => { raf = 0; document.documentElement.style.setProperty("--gx", `${x}%`); document.documentElement.style.setProperty("--gy", `${y}%`); document.documentElement.style.setProperty("--mx", String((x / 100 - 0.5) * 2)); document.documentElement.style.setProperty("--my", String((y / 100 - 0.5) * 2)); }); };
-    addEventListener("pointermove", move, { passive: true });
-    return () => removeEventListener("pointermove", move);
-  }, []);
-}

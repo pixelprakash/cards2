@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { newSession } from "./model.js";
 import { clearSession, loadSession, saveSession } from "./storage.js";
 import { syncSession } from "./sync.js";
+import { flushWithdrawals } from "./withdraw.js";
 
 const Ctx = createContext(null);
 export const useSession = () => useContext(Ctx);
@@ -12,6 +13,7 @@ export function SessionProvider({ children }) {
     const s = loadSession();
     return s && s.route && !s.completedAt ? s : null;   // offered once on the entry screen
   });
+  useEffect(() => { flushWithdrawals(); }, []);   // finish any earlier withdrawal that did not reach the server
   const sessionRef = useRef(session);
   sessionRef.current = session;
 

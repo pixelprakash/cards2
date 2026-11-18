@@ -22,7 +22,7 @@ export default function ActivityFrame({ id, question, hint, valid, has, needText
       <div className="wrap narrow">
         <QBlock tone={meta.tone} eyebrow="Shared activity" badge={meta.required ? "Required" : "Optional"} title={meta.title} question={question} hint={hint} />
         {status === "skipped" && <p className="hint" style={{ marginTop: "1rem" }}>You skipped this earlier. Add an answer, or leave it skipped.</p>}
-        <div className="qgrid">
+        <div className={`qgrid tone-${meta.tone}`}>
           {children}
           {!meta.required && !has && (
             <div className="later"><button type="button" className="btn-text" onClick={() => mark("skipped")}>Skip this activity</button></div>

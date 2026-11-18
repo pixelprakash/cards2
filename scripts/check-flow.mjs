@@ -61,19 +61,25 @@ ok(DIMENSIONS.every((d) => dimState(b, d) === "todo"), "all dimensions start as 
 // Database: save, update, list, rate limit, withdraw, researcher delete (in-memory Postgres).
 const browserWindow = globalThis.window; delete globalThis.window;   // the in-memory Postgres behaves differently when it thinks it is in a browser
 const db = await import("../api/_db.js");
-const one = sanitise(JSON.parse(JSON.stringify(sessions.find((x) => x.route === "configure"))));
-await db.saveSession(one);
-await db.saveSession({ ...one, furthest: "done", updatedAt: new Date().toISOString() });
+const base = sanitise(JSON.parse(JSON.stringify(sessions.find((x) => x.route === "configure"))));
+const make = (n) => ({ ...base, id: `s_check${n}`, code: `LID-CHECK${n}` });
+const a1 = make(1);
+await db.saveSession(a1);
+await db.saveSession({ ...a1, furthest: "done", updatedAt: new Date().toISOString() });
 let listed = await db.listSessions();
 ok(listed.length === 1 && listed[0].furthest === "done", "save is an upsert and list returns the session");
-await db.saveSession({ ...one, code: "LID-ZZZZZZ", furthest: "entry" });
+await db.saveSession({ ...a1, code: "LID-ZZZZZZ", furthest: "entry" });
 listed = await db.listSessions();
 ok(listed[0].furthest === "done", "a different code cannot overwrite an existing session id");
-ok((await db.deleteSession({ id: one.id, code: "LID-ZZZZZZ" })) === 0, "withdraw needs the right code");
-ok((await db.deleteSession({ id: one.id, code: one.code })) === 1, "withdraw with id and code deletes it");
-await db.saveSession(one);
-ok((await db.deleteSession({ code: one.code })) === 1, "researcher delete by code");
-ok((await db.listSessions()).length === 0, "nothing left after deletes");
+ok((await db.deleteSession({ id: a1.id, code: "LID-ZZZZZZ" })) === 0, "withdraw needs the right code");
+ok((await db.deleteSession({ id: a1.id, code: a1.code })) === 1, "withdraw with id and code deletes it");
+await db.saveSession(a1);
+ok((await db.listSessions()).length === 0, "a late save cannot bring a withdrawn session back");
+const a2 = make(2);
+await db.saveSession(a2);
+ok((await db.deleteSession({ code: a2.code })) === 1, "researcher delete by code");
+await db.saveSession(a2);
+ok((await db.listSessions()).length === 0, "and it stays deleted");
 const hits = []; for (let i = 0; i < 3; i++) hits.push(await db.hit("test-ip", 600));
 ok(hits.join() === "1,2,3", "rate counter counts up");
 globalThis.window = browserWindow;

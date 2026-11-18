@@ -5,10 +5,10 @@ import { guard, stageOfPath, STAGE_RANK } from "../flow/flow.js";
 import { progress } from "../flow/progress.js";
 import { DIMENSION } from "../config/dimensions.js";
 import { ACTIVITIES } from "../config/activities.js";
-import { usePointerGlow } from "../hooks/motion.js";
 import { stagesFor } from "../config/stages.js";
 import InfoDialog from "./InfoDialogs.jsx";
 import Dialog from "./Dialog.jsx";
+import { queueWithdrawal } from "../state/withdraw.js";
 import { Check } from "./Icons.jsx";
 
 
@@ -46,7 +46,6 @@ export default function Shell() {
   const [withdraw, setWithdraw] = useState(false);
   const [note, setNote] = useState("");
   const stage = stageOfPath(pathname);
-  usePointerGlow();
 
   // Direction of travel decides which way the screen glides in.
   const prevPlace = useRef(place(pathname));
@@ -96,9 +95,9 @@ export default function Shell() {
       </footer>
       <InfoDialog which={info} onClose={() => setInfo(null)} />
       <Dialog open={withdraw} onClose={() => setWithdraw(false)} title="Withdraw your answers?"
-        actions={<button type="button" className="btn btn-soft" onClick={async () => {
-          try { await fetch("/api/sessions", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: session.id, code: session.code }) }); } catch { /* the local copy is cleared either way */ }
-          setWithdraw(false); reset(); setNote("Your answers were removed."); navigate("/");
+        actions={<button type="button" className="btn btn-soft" onClick={() => {
+          queueWithdrawal({ id: session.id, code: session.code });   // instant here; the server delete finishes in the background
+          setWithdraw(false); reset(); setNote("Done. Your answers are being removed."); navigate("/");
         }}>Withdraw</button>}>
         <p>This deletes everything stored for participant code {session.code}, here and with the research team, and clears this browser. It cannot be undone.</p>
       </Dialog>

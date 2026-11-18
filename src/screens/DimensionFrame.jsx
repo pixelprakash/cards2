@@ -34,10 +34,10 @@ export default function DimensionFrame({ dim, children, needText, parts }) {
     <>
       <div className="wrap narrow">
         {prev && <div style={{ marginBottom: "0.9rem" }}><TextButton onClick={() => navigate(PATH.dimensions)}>← All dimensions</TextButton></div>}
-        <QBlock tone={dim.tone} eyebrow={dimEyebrow(dim)} badge={dim.required ? "Required" : "Optional"} title={dim.title} question={dim.question} hint={dim.hint} />
+        <QBlock tone={dim.tone} eyebrow={dimEyebrow(dim)} badge={dim.required ? "Required" : "Optional"} title={dim.title} question={dim.question} hint={dim.hint} glyph={dim.id} />
         {d.status === "skipped" && <p className="hint" style={{ marginTop: "1rem" }}>You skipped this earlier. Add an answer, or leave it skipped.</p>}
         {d.status === "na" && <p className="hint" style={{ marginTop: "1rem" }}>You marked this as not applicable to your institution. Add an answer to change that.</p>}
-        <div className="qgrid">
+        <div className={`qgrid tone-${dim.tone}`}>
           {children}
           {!dim.required && !has && (
             <div className="later">

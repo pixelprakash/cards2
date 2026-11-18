@@ -26,6 +26,8 @@ async function run(text, params = []) {
   return runner(text, params);
 }
 
+// Tables are created only when a query finds them missing, so the common path is a single round trip
+// (the database can be an ocean away from the function, and every trip counts).
 let ready;
 const setup = () => (ready ??= (async () => {
   await run(`CREATE TABLE IF NOT EXISTS lid_sessions (
@@ -33,13 +35,21 @@ const setup = () => (ready ??= (async () => {
     created_at timestamptz NOT NULL, updated_at timestamptz NOT NULL, completed_at timestamptz, data jsonb NOT NULL)`);
   await run("CREATE INDEX IF NOT EXISTS lid_sessions_code ON lid_sessions (code)");
   await run("CREATE TABLE IF NOT EXISTS lid_rate (key text NOT NULL, bucket bigint NOT NULL, n integer NOT NULL DEFAULT 0, PRIMARY KEY (key, bucket))");
+  await run("CREATE TABLE IF NOT EXISTS lid_withdrawn (id text PRIMARY KEY, at timestamptz NOT NULL DEFAULT now())");
 })().catch((e) => { ready = undefined; throw e; }));
 
+const missing = (e) => e?.code === "42P01" || /does not exist/i.test(String(e?.message));
+async function query(text, params) {
+  try { return await run(text, params); }
+  catch (e) { if (!missing(e)) throw e; await setup(); return run(text, params); }
+}
+
+// A session that was withdrawn is never saved again, even if a slow save from the browser arrives afterwards.
 export async function saveSession(rec) {
-  await setup();
-  await run(
+  await query(
     `INSERT INTO lid_sessions (id, code, route, furthest, created_at, updated_at, completed_at, data)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
+     SELECT $1::text, $2::text, $3::text, $4::text, $5::timestamptz, $6::timestamptz, $7::timestamptz, $8::jsonb
+     WHERE NOT EXISTS (SELECT 1 FROM lid_withdrawn WHERE id = $1::text)
      ON CONFLICT (id) DO UPDATE SET furthest = EXCLUDED.furthest, updated_at = EXCLUDED.updated_at, completed_at = EXCLUDED.completed_at, data = EXCLUDED.data
      WHERE lid_sessions.code = EXCLUDED.code`,
     [rec.id, rec.code, rec.route, rec.furthest, rec.createdAt, rec.updatedAt, rec.completedAt, JSON.stringify(rec)],
@@ -47,25 +57,24 @@ export async function saveSession(rec) {
 }
 
 export async function listSessions() {
-  await setup();
-  const rows = await run("SELECT data FROM lid_sessions ORDER BY created_at");
+  const rows = await query("SELECT data FROM lid_sessions ORDER BY created_at");
   return rows.map((r) => (typeof r.data === "string" ? JSON.parse(r.data) : r.data));
 }
 
 // A participant withdraws with their own session id and code (both are needed). A researcher deletes by code alone.
+// Either way the session id is remembered, so a late save from the browser cannot bring it back.
 export async function deleteSession({ id, code }) {
-  await setup();
   const rows = id
-    ? await run("DELETE FROM lid_sessions WHERE id = $1 AND code = $2 RETURNING id", [id, code])
-    : await run("DELETE FROM lid_sessions WHERE code = $1 RETURNING id", [code]);
+    ? await query("DELETE FROM lid_sessions WHERE id = $1 AND code = $2 RETURNING id", [id, code])
+    : await query("DELETE FROM lid_sessions WHERE code = $1 RETURNING id", [code]);
+  for (const r of rows) await query("INSERT INTO lid_withdrawn (id) VALUES ($1) ON CONFLICT (id) DO NOTHING", [r.id]);
   return rows.length;
 }
 
 // Counts how many times a key (an IP address) has been seen in the current window. Old windows are tidied now and then.
 export async function hit(key, windowSeconds = 600) {
-  await setup();
   const bucket = Math.floor(Date.now() / 1000 / windowSeconds);
-  const rows = await run("INSERT INTO lid_rate (key, bucket, n) VALUES ($1, $2, 1) ON CONFLICT (key, bucket) DO UPDATE SET n = lid_rate.n + 1 RETURNING n", [key, bucket]);
-  if (Math.random() < 0.02) await run("DELETE FROM lid_rate WHERE bucket < $1", [bucket - 2]);
+  const rows = await query("INSERT INTO lid_rate (key, bucket, n) VALUES ($1, $2, 1) ON CONFLICT (key, bucket) DO UPDATE SET n = lid_rate.n + 1 RETURNING n", [key, bucket]);
+  if (Math.random() < 0.02) await query("DELETE FROM lid_rate WHERE bucket < $1", [bucket - 2]);
   return Number(rows[0]?.n ?? 1);
 }

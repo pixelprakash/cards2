@@ -26,7 +26,12 @@ npm run check      # headless checks: sanitising, flattening, profile, route gua
 | 4 Your institution | `/institution`, `/profile` | Participant-written formation and change, then an organised, editable profile that the participant approves. |
 | 5 Reflection | `/reflection`, `/done` | Three optional prompts (frozen wording), submit, participant code. |
 
-Researcher: `/researcher` (sign-in, then dashboard, exports, sample-data preview).
+Researcher: `/researcher` (sign-in, then the dashboard).
+
+The dashboard has filters (period, route, status, find a participant) and seven tabs: Overview (headline figures, starts per day, funnel, devices), Dimensions, Activities,
+Profiles, In their words (searchable verbatim answers), Participants (open anyone to read everything they did, download their report, or delete them) and Download.
+Downloads are made in the browser from the filtered view: Excel workbook (.xlsx, one sheet per topic plus a read-me), Word report (.docx), PDF report (opens the print dialog, choose Save as PDF),
+and CSV / JSON. The Word and Excel files are written by hand as zipped XML (`src/export/office.js`), so any script survives and nothing heavy is shipped; they load only when asked for.
 
 ## Folder map
 
@@ -60,7 +65,7 @@ scripts/         check-flow.mjs
 The table is created on first use. Without a database the experience still works; the dashboard says nothing is connected and offers the sample preview.
 Run locally with an in-memory database: `LID_LOCAL_DB=1 npm run dev`.
 
-Data controls: participants can withdraw their own answers (footer, by session id plus code); researchers can delete a participant by code on the dashboard; saving is rate limited per IP.
+Data controls: participants can withdraw their own answers from the footer (instant on screen; the delete finishes in the background and is retried until the server confirms); researchers can delete a participant from the dashboard; a withdrawn session id is remembered so a late save cannot bring it back; saving is rate limited per IP. The functions run in `iad1` (next to a Neon database in us-east-2), because every database round trip across an ocean is slow. If your database is elsewhere, change `regions` in `vercel.json` to match.
 
 ## Feel and motion
 
