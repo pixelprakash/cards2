@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { download, responsesCsv, summaryCsv } from "../exports.js";
-import { printHtml } from "../print.js";
+import { printHtml } from "../../export/print.js";
 
 const MIME = { xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
 

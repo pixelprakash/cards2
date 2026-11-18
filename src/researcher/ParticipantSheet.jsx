@@ -4,7 +4,7 @@ import { answer as ans, itemLabel as label, sectionLabel } from "../export/label
 import { SECTIONS, EMPTY_SECTION } from "../profile/organise.js";
 import { STAGE_LABEL, minutes } from "./metrics.js";
 import { download } from "./exports.js";
-import { printHtml } from "./print.js";
+import { printHtml } from "../export/print.js";
 
 
 // Everything one participant did, in a side sheet. Download it, or delete it (two steps, so it cannot happen by accident).

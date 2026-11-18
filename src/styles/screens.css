@@ -2,7 +2,6 @@
 .hero { display: grid; gap: clamp(1.5rem, 4vw, 2.5rem); padding-block: clamp(1rem, 4vw, 3rem) 1rem; }
 .routes { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); margin-top: 0.5rem; }
 .route { all: unset; box-sizing: border-box; position: relative; cursor: pointer; display: grid; gap: 1.5rem; align-content: space-between; min-height: 15rem; padding: clamp(1.4rem, 3vw, 2.2rem); border-radius: var(--radius); background: var(--tone); color: var(--on); transition: translate 0.4s var(--ease), rotate 0.4s var(--ease); }
-.route:hover { translate: 0 -6px; rotate: -0.5deg; }
 .route:focus-visible { outline: 3px solid var(--focus); outline-offset: 5px; }
 .route .rt { font: 700 clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem)/1.05 var(--font); letter-spacing: -0.035em; }
 .route .rs { font: 400 1.25rem/1.4 var(--font); max-width: 26rem; }
@@ -131,10 +130,10 @@
 
 /* hub: one clear next step */
 .upnext { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1.1rem 1.4rem; border-radius: var(--radius); background: var(--paper); color: var(--ink); }
-.upnext .u-l { font: 700 0.9375rem/1.2 var(--font); letter-spacing: 0.06em; text-transform: uppercase; }
+.upnext .u-l { font: 600 1rem/1.2 var(--font); }
 .upnext .u-t { font: 700 1.5rem/1.2 var(--font); letter-spacing: -0.02em; }
 .tile.is-next { outline: 3px solid var(--paper); outline-offset: 3px; }
-.tile .nextflag { font: 700 0.875rem/1 var(--font); letter-spacing: 0.06em; text-transform: uppercase; background: var(--paper); color: var(--ink); padding: 0.3rem 0.6rem; border-radius: 99px; }
+.tile .nextflag { font: 700 0.875rem/1 var(--font); background: var(--paper); color: var(--ink); padding: 0.3rem 0.6rem; border-radius: 99px; }
 
 .hubhead { display: grid; gap: 0.6rem; margin-bottom: 1.5rem; }
 .hubhead .title { max-width: 30rem; }
@@ -151,7 +150,7 @@
 .display .underline { position: absolute; left: -2%; bottom: -0.12em; width: 104%; height: 0.2em; color: var(--pink); pointer-events: none; }
 .soft { color: var(--muted); font-size: 1.125rem; max-width: 30rem; text-wrap: pretty; }
 .soft.small-note { font-size: 1rem; }
-.hero-art { width: min(100%, 22rem); justify-self: center; rotate: 2deg; animation: float 7s ease-in-out infinite; }
+.hero-art { width: min(100%, 22rem); justify-self: center; rotate: 2deg; }
 @media (max-width: 819px) { .hero-art { width: 12rem; justify-self: start; margin-top: -0.4rem; } }
 .point { display: flex; align-items: center; gap: 0.8rem; color: var(--pink); font: italic 400 1.5rem/1 var(--serif); margin-bottom: -0.6rem; }
 .arrow-doodle { width: 2.6rem; height: 2.3rem; rotate: -8deg; flex: none; }
@@ -255,3 +254,17 @@
   .alloc-row .extras { grid-area: ex; display: none; opacity: 1; padding-block: 0.3rem 0.4rem; }
   .alloc-row:focus-within .extras { display: inline-flex; }
 }
+
+
+/* ===== Smoothness =====
+   Moving things under the pointer can make them flicker at their edges (the pointer leaves, the thing moves back, repeat).
+   Each lifted or nudged control gets an invisible rim as big as its movement, so it holds still while hovered. */
+.btn::after, .drow::after, .person::after { content: ""; position: absolute; inset: -6px -4px -8px; border-radius: inherit; }
+.drow, .person { position: relative; }
+/* slides never add a sideways scrollbar for a moment */
+main { overflow-x: clip; }
+.stepline { min-height: 2.1rem; }
+
+/* a note, not a label: the opening line on the landing page reads like something written by hand */
+.note-hand { font: italic 400 clamp(1.5rem, 1.25rem + 1vw, 1.9rem)/1.15 var(--serif); color: var(--pink); rotate: -1.2deg; transform-origin: left center; display: inline-flex; align-items: center; gap: 0.6rem; }
+.note-hand::before { content: ""; width: 1.4rem; height: 1.4rem; flex: none; background: var(--sand); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); rotate: 12deg; }

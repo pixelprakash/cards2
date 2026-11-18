@@ -1,13 +1,11 @@
 import { pct } from "../metrics.js";
-import { useCountUp } from "../../hooks/motion.js";
 import BarList from "../BarList.jsx";
 
 const n1 = (v) => (Number.isInteger(v) ? v : v.toFixed(1));
 
-// A headline figure that counts up. Pass num (with optional suffix and decimals), or v for text.
+// A headline figure. Pass num (with optional suffix and decimals), or v for text.
 function Stat({ tone, num, suffix = "", decimals = 0, v, l, s }) {
-  const n = useCountUp(num ?? 0);
-  const shown = num == null ? v : `${n.toFixed(decimals)}${suffix}`;
+  const shown = num == null ? v : `${num.toFixed(decimals)}${suffix}`;
   return <div className={`stat tone-${tone}`}><span className="v">{shown}</span><span className="l">{l}</span>{s && <span className="s">{s}</span>}</div>;
 }
 

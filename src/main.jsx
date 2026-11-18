@@ -10,6 +10,8 @@ import "./styles/components.css";
 import "./styles/screens.css";
 import "./styles/motion.css";
 
+document.body.classList.add("grain");
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ErrorBoundary>

@@ -66,7 +66,7 @@ main { flex: 1; padding-block: clamp(1rem, 3vw, 2rem) 7rem; outline: none; }
 .choice input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 3px; }
 .choice input:disabled + label { opacity: 0.5; cursor: not-allowed; }
 .choices.cols { grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); }
-.badge { display: inline-block; padding: 0.15rem 0.7rem; border-radius: 999px; background: var(--ink); color: var(--paper); font: 700 0.875rem/1.5 var(--font); letter-spacing: 0.04em; text-transform: uppercase; }
+.badge { display: inline-block; padding: 0.15rem 0.7rem; border-radius: 999px; background: var(--ink); color: var(--paper); font: 700 0.9375rem/1.5 var(--font); }
 .badge.light { background: var(--paper); color: var(--ink); }
 .counter { font-weight: 700; }
 

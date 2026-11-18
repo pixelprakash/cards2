@@ -33,7 +33,7 @@ export default function ResearcherApp() {
       </header>
       <main className="wrap" id="main" tabIndex={-1}>
         <h1 className="sr-only">Research dashboard</h1>
-        {user === undefined && <p className="lede">Checking…</p>}
+        {user === undefined && <div className="checking" aria-busy="true"><span className="sr-only">Checking your sign-in…</span></div>}
         {user === null && <SignIn onDone={(u) => { setUser(u); load(); }} />}
         {user && (
           <>

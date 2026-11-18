@@ -15,9 +15,10 @@ export const fileStamp = stamp;
 export { sectionLabel };
 
 // ---------- one participant
-export function participantReport(s) {
+export function participantReport(s, { own = false } = {}) {
   const versions = s.profile?.versions ?? [];
   const approved = versions.find((v) => v.id === s.profile?.approvedVersionId) ?? versions[versions.length - 1];
+  if (own) return ownReport(s, approved);
   const blocks = [
     { type: "title", text: `Participant ${s.code}` },
     { type: "note", text: `Learning Institutions by Design · exported ${date(new Date().toISOString())}` },
@@ -38,6 +39,20 @@ export function participantReport(s) {
   blocks.push({ type: "note", text: "Provenance shows where each piece came from: researcher-provided options, participant-selected, participant-generated (their own words), participant-modified, system-organised, participant-approved." });
   const rows = flatten(s).filter((r) => r.section !== "profile" && !(r.item === "status" && r.value === "unanswered" && r.section.startsWith("dimension") && s.route !== "configure"));
   blocks.push({ type: "table", widths: [3, 2, 5, 2, 3], rows: [["Part", "Item", "Answer", "Status", "Provenance"], ...rows.map((r) => [sectionLabel(r.section), itemLabel(r.item), answer(r), r.status, r.provenance])] });
+  return blocks;
+}
+
+// What a participant takes home: their institution and their own answers, in plain words.
+function ownReport(s, profile) {
+  const blocks = [
+    { type: "title", text: "My institution" },
+    { type: "note", text: `Learning Institutions by Design · participant code ${s.code} · ${date(s.completedAt ?? new Date().toISOString())}` },
+  ];
+  if (profile) SECTIONS.forEach((sec) => { blocks.push({ type: "h1", text: sec.title }); blocks.push({ type: "p", text: profile.sections?.[sec.id] || EMPTY_SECTION }); });
+  blocks.push({ type: "h1", text: "My answers" });
+  blocks.push({ type: "note", text: "Everything you chose or wrote, in the order you went through it." });
+  const rows = flatten(s).filter((r) => r.section !== "profile" && r.item !== "status" && answer(r) !== "" && answer(r) != null);
+  blocks.push({ type: "table", widths: [3, 3, 6], rows: [["Part", "Item", "My answer"], ...rows.map((r) => [sectionLabel(r.section), itemLabel(r.item), answer(r)])] });
   return blocks;
 }
 

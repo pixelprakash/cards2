@@ -1,8 +1,8 @@
 /* ===== Motion and feel =====
    Everything here is decoration or feedback. base.css switches animation and transition off for people who ask for reduced motion. */
 
-/* --- a little grain over everything, like paper --- */
-body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: 0.09; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+/* --- a little grain over the participant screens, like paper (never on the researcher view) --- */
+body.grain::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: 0.045; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
 
 /* --- overall progress, a thin bar across the top --- */
 .progress { position: fixed; inset: 0 0 auto 0; height: 5px; z-index: 60; background: transparent; pointer-events: none; }
@@ -67,7 +67,7 @@ body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-event
 /* --- fields --- */
 .input, .textarea, .select { transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease), translate 0.3s var(--ease); }
 .input:focus, .textarea:focus, .select:focus { box-shadow: 0 0 0 6px rgba(255, 171, 200, 0.28); }
-.textarea { overflow: hidden; resize: none; transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease), height 0.15s ease-out; }
+.textarea { overflow: hidden; resize: none; }   /* no height transition: it fights the auto-grow on every keystroke */
 .step { animation: rise 0.45s var(--ease) backwards; }
 .step::before { transition: scale 0.3s var(--ease), rotate 0.3s var(--ease); }
 .step:focus-within::before { scale: 1.15; rotate: -8deg; }
@@ -118,7 +118,6 @@ body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-event
 @media (max-width: 760px) { .d2, .d4 { display: none; } .d1 { top: 1%; right: 4%; width: 3.5rem; } .d3 { top: 6%; right: 22%; width: 2.2rem; } }
 .word { display: inline-block; animation: word-in 0.9s var(--ease) backwards; animation-delay: calc(var(--w, 0) * 110ms + 0.1s); }
 .route { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(0); transition: transform 0.35s var(--ease), translate 0.4s var(--ease); overflow: hidden; }
-.route:hover { translate: 0; rotate: 0deg; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px); }
 .route::after { content: ""; position: absolute; inset: 0; background: radial-gradient(22rem circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.35), transparent 60%); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
 .route:hover::after { opacity: 1; }
 .route .go i { transition: rotate 0.4s var(--ease), scale 0.3s var(--ease); }
@@ -140,3 +139,6 @@ dialog.dlg::backdrop { animation: fade 0.3s ease; }
 .bl .track i { transition: width 1s var(--ease); transition-delay: calc(var(--i, 0) * 50ms); }
 
 @media (max-width: 640px) { .saved .saved-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+
+/* The researcher view is a working tool: nothing slides, rises or counts up when it opens. */
+body.researcher *, body.researcher *::before, body.researcher *::after { animation: none !important; }

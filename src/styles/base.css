@@ -1,5 +1,5 @@
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-block: 1.5rem 9.5rem; }   /* a focused field is never hidden behind the sticky bar (WCAG 2.4.11) */
 body {
   margin: 0; background: var(--bg); color: var(--fg);
   font: 400 1.0625rem/1.55 var(--font); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
@@ -11,6 +11,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 a { color: inherit; text-underline-offset: 0.2em; }
 img, svg { display: block; max-width: 100%; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+main:focus, main:focus-visible { outline: none; }   /* main only takes focus from the skip link and on a new screen; it is not a control */
 .on-light :focus-visible, .tone-block :focus-visible { outline-color: var(--ink); }
 ::selection { background: var(--pink); color: var(--ink); }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -25,7 +26,7 @@ img, svg { display: block; max-width: 100%; }
 .title { font: 300 clamp(2rem, 1.6rem + 2.6vw, 3.4rem)/1.06 var(--font); letter-spacing: -0.03em; text-wrap: balance; }
 .title b { font-weight: 700; }
 .lede { font: 400 clamp(1.2rem, 1.1rem + 0.7vw, 1.6rem)/1.35 var(--font); letter-spacing: -0.01em; max-width: 44rem; text-wrap: pretty; }
-.eyebrow { font: 700 0.9375rem/1.2 var(--font); letter-spacing: 0.08em; text-transform: uppercase; }
+.eyebrow { font: 600 1.0625rem/1.3 var(--font); }
 .muted { color: var(--muted); }
 .small { font-size: 1rem; }
 .hint { color: var(--muted); font-size: 1.0625rem; max-width: 46rem; text-wrap: pretty; }

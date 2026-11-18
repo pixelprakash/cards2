@@ -8,4 +8,6 @@ import "../styles/screens.css";
 import "./researcher.css";
 import "../styles/motion.css";
 
+document.body.classList.add("researcher");
+
 createRoot(document.getElementById("root")).render(<StrictMode><ResearcherApp /></StrictMode>);

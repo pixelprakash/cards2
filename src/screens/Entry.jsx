@@ -58,7 +58,7 @@ export default function Entry() {
 
       <section className="hero2">
         <div className="copy">
-          <p className="eyebrow">A participatory research experience</p>
+          <p className="note-hand">A research study about places for learning</p>
           <h1 className="display">Design Your <span className="ul"><b>Institution</b><Underline /></span></h1>
           <p className="lede">What might a different institution for learning look like?</p>
           <p className="soft">There are no right answers. Go with what feels true, and skip anything you like.</p>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSession } from "../state/SessionContext.jsx";
 import { guard, stageOfPath, STAGE_RANK } from "../flow/flow.js";
 import { progress } from "../flow/progress.js";
@@ -22,7 +22,7 @@ const place = (p) => {
 
 // One quiet line says where you are, instead of five chips competing for attention.
 function StepLine({ stage, route }) {
-  if (stage === "entry" || stage === "done") return null;
+  if (stage === "entry" || stage === "done") return <div className="stepline" aria-hidden="true" />;
   const stages = stagesFor(route);
   const i = stages.findIndex((x) => x.id === stage);
   return (
@@ -46,17 +46,16 @@ export default function Shell() {
   const [withdraw, setWithdraw] = useState(false);
   const [note, setNote] = useState("");
   const stage = stageOfPath(pathname);
+  const redirect = guard(session, pathname);   // a screen that is not open yet is never drawn, not even for a frame
+
+  // The tick pulses once the participant pauses, not on every keystroke.
+  const [pulse, setPulse] = useState(0);
+  useEffect(() => { const t = setTimeout(() => setPulse((n) => n + 1), 700); return () => clearTimeout(t); }, [session.updatedAt]);
 
   // Direction of travel decides which way the screen glides in.
   const prevPlace = useRef(place(pathname));
   const dir = place(pathname) >= prevPlace.current ? "fwd" : "back";
   useEffect(() => { prevPlace.current = place(pathname); }, [pathname]);
-
-  // Screens that are not available yet send the participant to the right place.
-  useEffect(() => {
-    const to = guard(session, pathname);
-    if (to) navigate(to, { replace: true });
-  }, [session, pathname, navigate]);
 
   // Remember the furthest stage reached.
   useEffect(() => {
@@ -72,6 +71,8 @@ export default function Shell() {
     mainRef.current?.focus({ preventScroll: true });
   }, [pathname]);
 
+  if (redirect) return <Navigate to={redirect} replace />;
+
   return (
     <div className={`shell${FOCUS(pathname) ? " is-focus" : ""}`}>
       <div className="progress" aria-hidden="true"><i style={{ "--prog": progress(session, pathname) }} /></div>
@@ -79,7 +80,7 @@ export default function Shell() {
       <header className="wrap topbar">
         <Link className="brand" to="/" aria-label="Learning Institutions by Design, start"><span>learning institutions by design</span></Link>
         <div className="topbar-actions">
-          {session.route && <span className="saved" title="Your answers are kept in this browser"><Check key={session.updatedAt} /><span className="saved-t">Saved</span></span>}
+          {session.route && <span className="saved" title="Your answers are kept in this browser"><Check key={pulse} /><span className="saved-t">Saved</span></span>}
           <button type="button" className="btn btn-soft btn-small" onClick={() => setInfo("help")}>Help</button>
         </div>
       </header>
