@@ -48,10 +48,6 @@ export default function Shell() {
   const stage = stageOfPath(pathname);
   const redirect = guard(session, pathname);   // a screen that is not open yet is never drawn, not even for a frame
 
-  // The tick pulses once the participant pauses, not on every keystroke.
-  const [pulse, setPulse] = useState(0);
-  useEffect(() => { const t = setTimeout(() => setPulse((n) => n + 1), 700); return () => clearTimeout(t); }, [session.updatedAt]);
-
   // Direction of travel decides which way the screen glides in.
   const prevPlace = useRef(place(pathname));
   const dir = place(pathname) >= prevPlace.current ? "fwd" : "back";
@@ -80,7 +76,7 @@ export default function Shell() {
       <header className="wrap topbar">
         <Link className="brand" to="/" aria-label="Learning Institutions by Design, start"><span>learning institutions by design</span></Link>
         <div className="topbar-actions">
-          {session.route && <span className="saved" title="Your answers are kept in this browser"><Check key={pulse} /><span className="saved-t">Saved</span></span>}
+          {session.route && <span className="saved" title="Your answers are kept in this browser"><Check /><span className="saved-t">Saved</span></span>}
           <button type="button" className="btn btn-soft btn-small" onClick={() => setInfo("help")}>Help</button>
         </div>
       </header>

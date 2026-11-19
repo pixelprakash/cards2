@@ -11,10 +11,10 @@ body.grain::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer
 .saved svg { width: 0.95rem; height: 0.95rem; color: var(--pink); animation: pop-in 0.5s var(--ease); }
 
 /* --- screens glide in, in the direction you are travelling --- */
-.screen { animation: screen-in 0.45s var(--ease) backwards; }
+.screen { animation: screen-in 0.32s var(--ease) backwards; }
 .screen[data-dir="back"] { animation-name: screen-in-back; }
-@keyframes screen-in { from { opacity: 0; translate: 24px 0; } }
-@keyframes screen-in-back { from { opacity: 0; translate: -24px 0; } }
+@keyframes screen-in { from { opacity: 0.45; translate: 14px 0; } }
+@keyframes screen-in-back { from { opacity: 0.45; translate: -14px 0; } }
 @keyframes rise { from { opacity: 0; translate: 0 22px; } }
 @keyframes pop-in { 0% { scale: 0; rotate: -30deg; } 60% { scale: 1.25; } 100% { scale: 1; rotate: 0; } }
 @keyframes pop { 0% { scale: 1; } 35% { scale: 1.03; rotate: -0.4deg; } 100% { scale: 1; rotate: 0; } }
