@@ -3,9 +3,19 @@ import BarList from "../BarList.jsx";
 const n1 = (v) => (Number.isInteger(v) ? v : (Math.round(v * 10) / 10).toFixed(1));
 
 export default function ActivitiesPanel({ M }) {
-  const { al, te, ex, rt } = M;
+  const { al, te, ex, rt, co } = M;
   return (
     <div className="stack-lg">
+      <section className="rsec" aria-labelledby="c-h">
+        <h2 id="c-h">Answered, skipped or left blank</h2>
+        <p className="hint">Only people who reached each part are counted. Optional parts can be skipped on purpose; “left blank” means they moved past without answering or skipping.</p>
+        <div className="tbl-wrap" tabIndex={0} role="region" aria-label="Table, scrolls sideways on small screens">
+          <table className="tbl">
+            <thead><tr><th scope="col">Part</th><th scope="col">Answered</th><th scope="col">Skipped</th><th scope="col">Left blank</th><th scope="col">Who reached it</th></tr></thead>
+            <tbody>{co.map((r) => <tr key={r.id}><th scope="row">{r.label}{r.required ? <span className="tag-req"> required</span> : null}</th><td className="num">{r.answered}</td><td className="num">{r.skipped}</td><td className="num">{r.unanswered}</td><td className="num">{r.base}</td></tr>)}</tbody>
+          </table>
+        </div>
+      </section>
       <section className="rsec" aria-labelledby="a-h">
         <h2 id="a-h">Resource allocation</h2>
         <p className="hint">{al.n} participants. Average points out of 100. Points show relative priority, not budget shares.</p>

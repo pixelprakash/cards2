@@ -39,7 +39,7 @@ function tension(t) {
 function version(v) {
   const sections = {}; const edited = {};
   for (const k of ["purpose", "learning", "people", "place", "change"]) { sections[k] = str(v?.sections?.[k], 4000); if (v?.edited?.[k] === true) edited[k] = true; }
-  return { id: id(v?.id) ?? "v_0", kind: KINDS.has(v?.kind) ? v.kind : "draft", at: iso(v?.at), parentId: id(v?.parentId), inputHash: str(v?.inputHash, 16), sections, edited };
+  return { id: id(v?.id) ?? "v_0", kind: KINDS.has(v?.kind) ? v.kind : "draft", at: iso(v?.at), method: str(v?.method, 40), parentId: id(v?.parentId), inputHash: str(v?.inputHash, 16), sections, edited };
 }
 
 export function sanitise(r) {

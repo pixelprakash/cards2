@@ -2,7 +2,7 @@
 import { DIMENSION } from "../config/dimensions.js";
 import { ACTIVITY } from "../config/activities.js";
 
-const SECTION_LABEL = { entry: "Route", free: "Imagine Freely description", experience: "Learning experience", formation: "How it begins and changes", reflection: "Reflection", custom_dimension: "Dimension added by participant", profile: "Profile" };
+const SECTION_LABEL = { entry: "Route", free: "Imagine Freely description", experience: "Learning experience", formation: "How it begins and changes", reflection: "Reflection", custom_dimension: "Dimension added by participant", profile: "Profile", profile_version: "Profile versions", session: "Session" };
 export function sectionLabel(section) {
   if (section.startsWith("dimension:")) return DIMENSION[section.slice(10)]?.title ?? section;
   if (section.startsWith("activity:")) return ACTIVITY[section.slice(9)]?.title ?? section;

@@ -1,9 +1,9 @@
 import { DIMENSIONS, EDUCATOR_ROLES } from "../config/dimensions.js";
 import { ALLOCATION_CATEGORIES } from "../config/activities.js";
-import { flatten, toCsv } from "../export/flatten.js";
+import { flatten, safeCell, toCsv } from "../export/flatten.js";
 import { minutes } from "./metrics.js";
 
-const quote = (v) => { const t = String(v ?? "").replace(/\r?\n/g, " "); return /[",]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+const quote = (v) => { const t = safeCell(v); return /[",]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
 
 // One row per participant: the numbers a researcher usually wants side by side. First row is the header.
 export function summaryRows(sessions) {
@@ -23,9 +23,11 @@ export function summaryRows(sessions) {
   return lines;
 }
 
-export const summaryCsv = (sessions) => summaryRows(sessions).map((r) => r.map(quote).join(",")).join("\n");
+// A leading byte-order mark tells Excel the file is UTF-8, so other scripts (Hindi, Arabic, accents) and emoji display correctly.
+const BOM = "\uFEFF";
+export const summaryCsv = (sessions) => BOM + summaryRows(sessions).map((r) => r.map(quote).join(",")).join("\n");
 
-export const responsesCsv = (sessions) => toCsv(sessions.flatMap(flatten));
+export const responsesCsv = (sessions) => BOM + toCsv(sessions.flatMap(flatten));
 
 export function download(name, type, data) {
   const url = URL.createObjectURL(new Blob([data], { type }));

@@ -5,10 +5,10 @@
 // Without a database the function answers 503 and each browser keeps its own copy.
 import { currentUser } from "./_auth.js";
 import { sanitise } from "./_record.js";
-import { deleteSession, hasDb, hit, listSessions, saveSession } from "./_db.js";
+import { deleteSession, hasDb, hit, listSessions, saveSession, validCursor } from "./_db.js";
 
-const MAX_BODY = 120_000;
-const POSTS_PER_10_MIN = 300;   // per IP; a whole class behind one address stays well under this
+const MAX_BODY = 1_000_000;   // the cleaned copy is capped again in _record.js; a very thorough participant can reach several hundred KB
+const POSTS_PER_10_MIN = 900;   // per IP; a whole class behind one school network address (each person saves a handful of times) stays well under this
 const json = (res, status, body) => { res.setHeader("cache-control", "no-store"); res.status(status).json(body); };
 const parse = (body) => { if (typeof body === "string") { try { return JSON.parse(body); } catch { return null; } } return body ?? null; };
 const ip = (req) => String(req.headers["x-forwarded-for"] || "local").split(",")[0].trim().slice(0, 64);
@@ -20,19 +20,23 @@ export default async function handler(req, res) {
   if (!hasDb()) return json(res, 503, { error: "The shared database is not connected." });
   try {
     if (req.method === "POST") {
-      const raw = typeof req.body === "string" ? req.body : JSON.stringify(req.body ?? {});
+      let sent; try { sent = req.body; } catch { return json(res, 400, { error: "Not valid JSON." }); }
+      const raw = typeof sent === "string" ? sent : JSON.stringify(sent ?? {});
       if (raw.length > MAX_BODY) return json(res, 413, { error: "Too large." });
       if ((await hit(`post:${ip(req)}`)) > POSTS_PER_10_MIN) return json(res, 429, { error: "Too many requests for now." });
-      const rec = sanitise(parse(req.body));
+      const rec = sanitise(parse(sent));
       if (!rec) return json(res, 400, { error: "Not a valid session." });
       await saveSession(rec);
       return json(res, 200, { ok: true });
     }
     if (req.method === "GET") {
-      return json(res, 200, { sessions: await listSessions() });
+      const after = new URL(req.url || "/", "http://x").searchParams.get("after") || "";
+      if (after && !validCursor(after)) return json(res, 400, { error: "Not a valid page." });
+      return json(res, 200, await listSessions({ after }));
     }
     if (req.method === "DELETE") {
-      const body = parse(req.body) ?? {};
+      let sent; try { sent = req.body; } catch { return json(res, 400, { error: "Not valid JSON." }); }
+      const body = parse(sent) ?? {};
       const code = typeof body.code === "string" ? body.code : "";
       const id = typeof body.id === "string" ? body.id : "";
       if (!CODE.test(code)) return json(res, 400, { error: "Not a valid code." });

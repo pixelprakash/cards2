@@ -38,7 +38,7 @@ export function participantReport(s, { own = false } = {}) {
   blocks.push({ type: "h1", text: "Every answer" });
   blocks.push({ type: "note", text: "Provenance shows where each piece came from: researcher-provided options, participant-selected, participant-generated (their own words), participant-modified, system-organised, participant-approved." });
   const rows = flatten(s).filter((r) => r.section !== "profile" && !(r.item === "status" && r.value === "unanswered" && r.section.startsWith("dimension") && s.route !== "configure"));
-  blocks.push({ type: "table", widths: [3, 2, 5, 2, 3], rows: [["Part", "Item", "Answer", "Status", "Provenance"], ...rows.map((r) => [sectionLabel(r.section), itemLabel(r.item), answer(r), r.status, r.provenance])] });
+  blocks.push({ type: "table", widths: [3, 2, 5, 2, 3], rows: [["Part", "Item", "Answer", "Status", "Provenance"], ...rows.map((r) => [sectionLabel(r.section), itemLabel(r.item), r.section === "profile_version" ? `${answer(r)}${r.value ? ` (${r.value})` : ""} · ${r.detail} · ${date(r.timestamp)}` : answer(r), r.status, r.provenance])] });
   return blocks;
 }
 
@@ -51,7 +51,7 @@ function ownReport(s, profile) {
   if (profile) SECTIONS.forEach((sec) => { blocks.push({ type: "h1", text: sec.title }); blocks.push({ type: "p", text: profile.sections?.[sec.id] || EMPTY_SECTION }); });
   blocks.push({ type: "h1", text: "My answers" });
   blocks.push({ type: "note", text: "Everything you chose or wrote, in the order you went through it." });
-  const rows = flatten(s).filter((r) => r.section !== "profile" && r.item !== "status" && answer(r) !== "" && answer(r) != null);
+  const rows = flatten(s).filter((r) => !["profile", "profile_version", "session"].includes(r.section) && r.item !== "status" && answer(r) !== "" && answer(r) != null);
   blocks.push({ type: "table", widths: [3, 3, 6], rows: [["Part", "Item", "My answer"], ...rows.map((r) => [sectionLabel(r.section), itemLabel(r.item), answer(r)])] });
   return blocks;
 }
@@ -108,7 +108,7 @@ export function workbookSheets(sessions, filterNote = "") {
       ["", ""],
       ["Sheet", "What is in it"],
       ["Participants", "One row per participant: route, timings, status of every dimension, points per priority and per role, tensions."],
-      ["Responses", "Every answer as one row, with a provenance and a status. This is the sheet to filter and pivot."],
+      ["Responses", "Every answer as one row, with a status, a provenance and a timestamp where there is one. This is the sheet to filter and pivot. Session rows give started, last saved, submitted; profile_version rows give each profile version, how it was made (method) and which version it came from (parent)."],
       ["Allocation", "Resource allocation points per participant (each row totals 100)."],
       ["Educator roles", "Role points per participant (each row totals 100)."],
       ["Tensions", "Each chosen tension with the split between its two sides."],
@@ -117,9 +117,10 @@ export function workbookSheets(sessions, filterNote = "") {
       ["", ""],
       ["Status values", "answered · skipped · na (not applicable) · unanswered · zero (a points value of 0, which is a real answer)"],
       ["Provenance values", "researcher-provided · participant-selected · participant-generated · participant-modified · system-organised · participant-approved"],
+      ["About system-organised", "The brief calls this AI-organised. The profile draft is written by a rule-based organiser (method rule-based-v1) that only rearranges what the participant supplied. No AI model is used, so it is not labelled AI."],
     ] },
     { name: "Participants", rows: summaryRows(sessions), widths: [14, 12, 10, 22, 22, 9, 14, 9, 9, 9] },
-    { name: "Responses", rows: [COLUMNS, ...resp.map((r) => COLUMNS.map((c) => r[c]))], widths: [14, 14, 12, 24, 24, 24, 30, 50, 11, 22] },
+    { name: "Responses", rows: [COLUMNS, ...resp.map((r) => COLUMNS.map((c) => r[c]))], widths: [14, 14, 12, 24, 24, 24, 30, 50, 11, 22, 24, 40] },
     { name: "Allocation", rows: [["participant", "route", ...ALLOCATION_CATEGORIES.map((c) => c.label), "total"], ...sessions.filter((s) => Object.keys(s.activities?.allocation?.values ?? {}).length).map((s) => { const v = s.activities.allocation.values; return [s.code, s.route, ...ALLOCATION_CATEGORIES.map((c) => v[c.id] ?? ""), Object.values(v).reduce((a, b) => a + b, 0)]; })], widths: [14, 12, ...ALLOCATION_CATEGORIES.map(() => 16), 8] },
     { name: "Educator roles", rows: [["participant", ...EDUCATOR_ROLES.map((r) => r.label), "total"], ...sessions.filter((s) => Object.keys(s.dims?.educators?.roles?.values ?? {}).length).map((s) => { const v = s.dims.educators.roles.values; return [s.code, ...EDUCATOR_ROLES.map((r) => v[r.id] ?? ""), Object.values(v).reduce((a, b) => a + b, 0)]; })], widths: [14, ...EDUCATOR_ROLES.map(() => 16), 8] },
     { name: "Tensions", rows: [["participant", "side A", "side B", "points A", "points B", "added by participant", "explanation"], ...bySession((s) => (s.activities?.tensions?.selected ?? []).map((t) => [s.code, t.a, t.b, t.useSlider && t.value != null ? t.value : "", t.useSlider && t.value != null ? 100 - t.value : "", t.own ? "yes" : "no", t.note]))], widths: [14, 22, 22, 9, 9, 12, 50] },

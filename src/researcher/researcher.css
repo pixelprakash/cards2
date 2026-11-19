@@ -100,6 +100,7 @@ dialog.drawer[open] { animation: drawer-in 0.35s var(--ease); }
 .facts div { background: var(--surface); border-radius: 1rem; padding: 0.7rem 0.9rem; } .facts dt { color: var(--muted); font-size: 0.9375rem; } .facts dd { margin: 0; font-weight: 700; }
 .drawer h3 { font: 700 1.3rem/1.2 var(--font); letter-spacing: -0.015em; margin-bottom: 0.4rem; } .drawer h4 { font: 700 1.0625rem/1.3 var(--font); margin: 0.8rem 0 0.2rem; }
 .sh-sec p { white-space: pre-line; color: #e6e0d8; }
+.vers { display: grid; gap: 0.6rem; margin: 0.5rem 0 0; padding: 0; list-style: none; } .vers li { background: var(--surface); border-radius: 1rem; padding: 0.7rem 0.9rem; display: grid; gap: 0.15rem; } .vers .muted { color: var(--muted); font-size: 0.9375rem; }
 .sh-group { background: var(--surface); border-radius: 1rem; padding: 0.4rem 1rem; margin-bottom: 0.6rem; } .sh-group summary { cursor: pointer; font-weight: 700; min-height: 2.75rem; display: flex; align-items: center; gap: 0.4rem; } .sh-group summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 8px; }
 .sh-group ul { display: grid; gap: 0.7rem; padding: 0.2rem 0 0.8rem; }
 .sh-group li { display: grid; gap: 0.1rem; padding-left: 0.8rem; border-left: 3px solid var(--line); } .sh-group .it { color: var(--muted); font-size: 0.9375rem; } .sh-group .an { white-space: pre-line; } .sh-group .pv { color: var(--muted); font-size: 0.875rem; }

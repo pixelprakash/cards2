@@ -6,6 +6,10 @@ import { PRACTICES, PRACTICE_ACTIONS } from "../config/activities.js";
 import { dimOf, hasText } from "../state/model.js";
 import { categoriesFor } from "../flow/validate.js";
 
+// Which organiser wrote a draft (the brief calls this the AI prompt version). Bump it whenever the wording rules change,
+// so researchers can tell which drafts were made by which rules. A language-model organiser would get its own id and prompt version.
+export const ORGANISER = "rule-based-v1";
+
 export const SECTIONS = [
   { id: "purpose", title: "Purpose", tone: "pink" },
   { id: "learning", title: "Learning and knowledge", tone: "blue" },
@@ -19,7 +23,7 @@ export const EMPTY_SECTION = "You did not add anything for this part.";
 // "a, b and c". If an item already contains "and", semicolons keep the list readable.
 const list = (items) => {
   if (items.length <= 1) return items.join("");
-  if (items.some((i) => /\band\b/i.test(i))) return `${items.slice(0, -1).join("; ")}; and ${items[items.length - 1]}`;
+  if (items.some((i) => /\band\b/i.test(i))) return items.length === 2 ? `${items[0]}, and ${items[1]}` : `${items.slice(0, -1).join("; ")}; and ${items[items.length - 1]}`;
   return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 };
 const lower = (s) => (s ? s[0].toLowerCase() + s.slice(1) : s);
@@ -52,7 +56,7 @@ function learning(s) {
   const ideas = e.ideas.map((i) => i.text.trim()).filter(Boolean);
   if (ideas.length) bits.push(`People explore, practise or create: ${list(ideas)}.`);
   if (hasText(e.does)) bits.push(`Learners ${sentence(lower(e.does).replace(/^learners\s+/, ""))}`);
-  const who = [...CONTRIBUTOR_GROUPS.filter((g) => e.takesPart.picks.includes(g.id)).map((g) => lower(g.label)), ...e.takesPart.custom.filter((c) => e.takesPart.picks.includes(c.id)).map((c) => c.text.trim())];
+  const who = [...CONTRIBUTOR_GROUPS.filter((g) => e.takesPart.picks.includes(g.id)).map((g) => lower(g.label)), ...[...e.takesPart.custom, ...dimOf(s, "educators").contributors.custom].filter((c) => e.takesPart.picks.includes(c.id)).map((c) => c.text.trim())];
   if (who.length) bits.push(`Taking part: ${sentence(list(who))}`);
   const where = [...DIMENSION.locations.choices.filter((c) => e.where.picks.includes(c.id)).map((c) => lower(c.label)), ...e.where.custom.filter((c) => e.where.picks.includes(c.id)).map((c) => c.text.trim()), ...dimOf(s, "locations").custom.filter((c) => e.where.picks.includes(c.id)).map((c) => c.text.trim())];
   if (where.length) bits.push(`It happens in ${sentence(list(where))}`);
@@ -69,6 +73,7 @@ function learning(s) {
   add("credentials", "how people receive recognition");
   add("work", "how learning relates to work and everyday life");
   const tech = labelsOf(DIMENSION.technology, dimOf(s, "technology")); if (tech.length) { out.push(`On the role of technology and AI, you chose ${sentence(list(tech))}`); const n = dimOf(s, "technology").note; if (hasText(n)) out.push(`Where: ${sentence(n)}`); }
+  s.customDims.forEach((c) => out.push(`A dimension you added, ${c.title.trim()}${hasText(c.text) ? `: ${sentence(c.text)}` : "."}`));
   const pw = dimOf(s, "pathways"); const pl = labelsOf(DIMENSION.pathways, pw);
   if (pl.length) out.push(`On how people enter, progress, pause and return, you chose ${sentence(list(pl))}`);
   const stages = pw.stages.map((x) => x.text.trim()).filter(Boolean);

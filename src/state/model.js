@@ -56,3 +56,32 @@ export const dimOf = (session, id) => session.dims[id] ?? newDimension();
 
 export const hasText = (v) => typeof v === "string" && v.trim().length > 0;
 export const customLabel = (list, id) => list.find((x) => x.id === id)?.text ?? "";
+
+// Brings a saved session back to the shape the screens expect. Anything missing or of the wrong kind (an older build, a
+// half-written save, a hand-edited value) is replaced by the empty default for that spot; everything valid is kept.
+const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+function conform(value, template) {
+  if (Array.isArray(template)) return Array.isArray(value) ? value : template;
+  if (isObj(template)) {
+    const src = isObj(value) ? value : {};
+    const out = { ...src };
+    for (const k of Object.keys(template)) out[k] = conform(src[k], template[k]);
+    return out;
+  }
+  if (typeof template === "string") return typeof value === "string" ? value : template;
+  if (typeof template === "boolean") return typeof value === "boolean" ? value : template;
+  return value === undefined ? template : value;   // null and numbers: keep what is there
+}
+export function repairSession(saved) {
+  const base = newSession();
+  const s = conform(saved, base);
+  const dims = {};
+  if (isObj(saved.dims)) for (const [k, d] of Object.entries(saved.dims)) dims[k] = conform(d, newDimension());
+  s.dims = dims;
+  s.customDims = Array.isArray(saved.customDims) ? saved.customDims.filter((c) => isObj(c) && typeof c.title === "string") : [];
+  s.profile.versions = Array.isArray(saved.profile?.versions) ? saved.profile.versions.filter((v) => isObj(v) && isObj(v.sections)) : [];
+  s.activities.allocation.values = isObj(saved.activities?.allocation?.values) ? saved.activities.allocation.values : {};
+  s.activities.rethink.items = isObj(saved.activities?.rethink?.items) ? saved.activities.rethink.items : {};
+  if (s.route !== "free" && s.route !== "configure") s.route = null;
+  return s;
+}

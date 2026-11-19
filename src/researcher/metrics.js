@@ -1,7 +1,8 @@
 // Everything the researcher dashboard counts. Pure functions of an array of sessions (as stored by api/sessions.js).
 import { DIMENSIONS, CONTRIBUTOR_GROUPS, EDUCATOR_ROLES, NO_SINGLE_GROUP, NO_SINGLE_GROUP_LABEL } from "../config/dimensions.js";
-import { ALLOCATION_CATEGORIES, TENSIONS, REFLECTION_PROMPTS } from "../config/activities.js";
+import { ACTIVITIES, ALLOCATION_CATEGORIES, TENSIONS, REFLECTION_PROMPTS } from "../config/activities.js";
 import { SECTIONS } from "../profile/organise.js";
+import { experienceStatus } from "../flow/validate.js";
 
 const pct = (n, d) => (d ? Math.round((n / d) * 100) : 0);
 const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
@@ -77,18 +78,44 @@ export function tensions(sessions) {
 }
 
 export function experience(sessions) {
-  const ex = sessions.map((s) => s.experience).filter((e) => e && e.status !== "unanswered");
-  return { n: ex.length, answered: ex.filter((e) => e.status === "answered").length, meanSteps: mean(ex.map((e) => e.steps.length)), withSteps: ex.filter((e) => e.steps.length).length };
+  const ex = sessions.filter((s) => experienceStatus(s) !== "unanswered").map((s) => s.experience);
+  return { n: ex.length, answered: sessions.filter((s) => experienceStatus(s) === "answered").length, meanSteps: mean(ex.map((e) => e.steps.length)), withSteps: ex.filter((e) => e.steps.length).length };
+}
+
+// For every shared activity, the learning experience and each reflection prompt: how many answered, skipped or left
+// unanswered. Only people who got as far as that part are counted, so someone who left earlier is not called a skip.
+export function completion(sessions) {
+  const rank = (s) => (s.completedAt ? 5 : STAGE_ORDER.indexOf(s.furthest));
+  const count = (list, statusOf) => {
+    const out = { answered: 0, skipped: 0, unanswered: 0 };
+    list.forEach((s) => { const st = statusOf(s); out[st === "answered" ? "answered" : st === "skipped" ? "skipped" : "unanswered"]++; });
+    return { ...out, base: list.length };
+  };
+  const atActivities = sessions.filter((s) => rank(s) >= 2);
+  const rows = [{ id: "experience", label: "Build one learning experience", ...count(atActivities, experienceStatus) }];
+  ACTIVITIES.forEach((a) => rows.push({ id: a.id, label: a.title, required: a.required, ...count(atActivities, (s) => s.activities?.[a.id]?.status ?? "unanswered") }));
+  const atReflection = sessions.filter((s) => rank(s) >= 4);
+  REFLECTION_PROMPTS.forEach((p) => rows.push({ id: `reflection-${p.id}`, label: `Reflection: ${p.q}`, ...count(atReflection, (s) => (s.reflection?.[p.id]?.trim() ? "answered" : s.completedAt ? "skipped" : "unanswered")) }));
+  return rows;
 }
 
 export function writing(sessions) {
   const out = [];
   const add = (kind, s, text) => { if (text && text.trim()) out.push({ kind, code: s.code, route: s.route, text: text.trim(), at: s.createdAt }); };
   sessions.forEach((s) => {
+    const e = s.experience ?? {};
     add("Imagine Freely description", s, s.free?.text);
+    DIMENSIONS.forEach((d) => add(`Note: ${d.title}`, s, s.dims?.[d.id]?.note));
+    (s.customDims ?? []).forEach((c) => add("Dimension added by participant", s, `${c.title}${c.text ? `: ${c.text}` : ""}`));
+    add("Learning experience: what learners do", s, e.does);
+    add("Learning experience: what people might make, understand or change", s, e.outcomes);
     add("Purpose", s, s.activities?.purpose?.text);
     add("Signature practice", s, s.activities?.signature?.practice);
+    add("Signature practice: intended effect", s, s.activities?.signature?.effect);
+    add("Signature practice: difficulty or unintended effect", s, s.activities?.signature?.difficulty);
+    (s.activities?.tensions?.selected ?? []).forEach((t) => add(`About the tension ${t.a} / ${t.b}`, s, t.note));
     add("How it begins", s, s.formation?.begins);
+    add("What is tried, adapted, continued or stopped", s, s.formation?.tried);
     REFLECTION_PROMPTS.forEach((p) => add(`Reflection: ${p.q}`, s, s.reflection?.[p.id]));
   });
   return out;

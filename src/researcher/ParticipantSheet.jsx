@@ -17,7 +17,7 @@ export default function ParticipantSheet({ session, onClose, onDelete, sample })
   const groups = useMemo(() => {
     if (!session) return [];
     const map = new Map();
-    flatten(session).filter((r) => r.section !== "profile").forEach((r) => {
+    flatten(session).filter((r) => !["profile", "profile_version", "session"].includes(r.section)).forEach((r) => {
       const key = sectionLabel(r.section);
       if (!map.has(key)) map.set(key, []);
       map.get(key).push(r);
@@ -60,6 +60,25 @@ export default function ParticipantSheet({ session, onClose, onDelete, sample })
           <section aria-labelledby="sh-p">
             <h3 id="sh-p">{shown.kind === "approved" ? "Approved profile" : "Latest profile draft"}</h3>
             {SECTIONS.map((s) => <div key={s.id} className="sh-sec"><h4>{s.title}{shown.edited?.[s.id] ? <span className="tag-req"> edited by participant</span> : null}</h4><p>{shown.sections?.[s.id] || EMPTY_SECTION}</p></div>)}
+          </section>
+        )}
+
+        {versions.length > 0 && (
+          <section aria-labelledby="sh-v">
+            <h3 id="sh-v">Profile versions</h3>
+            <p className="hint">Participant input, then each draft, edit and the approved profile, each linked to the one before.</p>
+            <ol className="vers">
+              {versions.map((v) => {
+                const parent = versions.findIndex((x) => x.id === v.parentId);
+                const touched = Object.keys(v.edited ?? {}).map((k) => SECTIONS.find((x) => x.id === k)?.title).filter(Boolean);
+                return (
+                  <li key={v.id}>
+                    <b>{v.kind === "draft" ? "Organised draft" : v.kind === "edited" ? "Participant edit" : "Approved profile"}</b>
+                    <span className="muted"> · {v.at ? new Date(v.at).toLocaleString() : ""} · {v.method || "method not recorded"} · {parent >= 0 ? `from version ${parent + 1}` : "from the participant’s answers"}{touched.length ? ` · edited: ${touched.join(", ")}` : ""}</span>
+                  </li>
+                );
+              })}
+            </ol>
           </section>
         )}
 

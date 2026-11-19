@@ -1,5 +1,5 @@
 // Save and resume lives in this browser only (localStorage). Failures are ignored: the experience works without it.
-import { newSession } from "./model.js";
+import { repairSession } from "./model.js";
 
 const KEY = "lid.session.v1";
 
@@ -8,7 +8,7 @@ export function loadSession() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
     const s = JSON.parse(raw);
-    return s && s.v === 1 && typeof s.id === "string" ? { ...newSession(), ...s } : null;
+    return s && s.v === 1 && typeof s.id === "string" ? repairSession(s) : null;
   } catch { return null; }
 }
 

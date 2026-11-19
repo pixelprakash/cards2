@@ -14,6 +14,14 @@ export function experienceHasContent(e) {
     || e.steps.some((s) => hasText(s.text));
 }
 
+// The status of the "build one learning experience" answer. On Route A it is set when the participant moves on;
+// on Route B it belongs to dimension 11. Anything actually written counts as answered, so the two routes read the same.
+export function experienceStatus(session) {
+  if (experienceHasContent(session.experience)) return "answered";
+  const own = session.route === "configure" ? session.dims?.pedagogy?.status : session.experience?.status;
+  return own ?? "unanswered";
+}
+
 // Has the participant put anything into this dimension?
 export function dimHasContent(session, dim) {
   const d = dimOf(session, dim.id);

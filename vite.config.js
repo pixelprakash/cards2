@@ -15,7 +15,9 @@ function localApi() {
           const chunks = [];
           for await (const c of req) chunks.push(c);
           const raw = Buffer.concat(chunks).toString();
-          req.body = (req.headers["content-type"] || "").includes("json") && raw ? JSON.parse(raw) : raw;
+          // Like Vercel: a body that is not valid JSON makes reading req.body throw, which the handlers turn into a 400.
+          const parsed = (() => { try { return (req.headers["content-type"] || "").includes("json") && raw ? JSON.parse(raw) : raw; } catch { return undefined; } })();
+          Object.defineProperty(req, "body", { get() { if (parsed === undefined) throw new Error("Invalid JSON"); return parsed; }, configurable: true });
           res.status = (code) => ((res.statusCode = code), res);
           res.json = (obj) => (res.setHeader("content-type", "application/json"), res.end(JSON.stringify(obj)));
           await mod.default(req, res);

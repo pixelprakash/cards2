@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { allocation, daily, dimensions, educators, experience, funnel, inPeriod, overview, profiles, rethink, tensions, writing } from "./metrics.js";
+import { allocation, completion, daily, dimensions, educators, experience, funnel, inPeriod, overview, profiles, rethink, tensions, writing } from "./metrics.js";
 import Overview from "./panels/Overview.jsx";
 import DimensionsPanel from "./panels/DimensionsPanel.jsx";
 import ActivitiesPanel from "./panels/ActivitiesPanel.jsx";
@@ -26,7 +26,7 @@ export default function Dashboard({ sessions, sample, offline, onSample, sampleO
   const tabRefs = useRef({});
 
   const list = useMemo(() => inPeriod(sessions, f.days).filter((s) => (!f.route || s.route === f.route) && (!f.only || (f.only === "done" ? s.completedAt : !s.completedAt)) && (!f.q || s.code.toLowerCase().includes(f.q.trim().toLowerCase()))), [sessions, f]);
-  const M = useMemo(() => ({ o: overview(list), fun: funnel(list), days: daily(list), dims: dimensions(list), ed: educators(list), al: allocation(list), te: tensions(list), ex: experience(list), pr: profiles(list), wr: writing(list), rt: rethink(list) }), [list]);
+  const M = useMemo(() => ({ o: overview(list), fun: funnel(list), days: daily(list), dims: dimensions(list), ed: educators(list), al: allocation(list), te: tensions(list), ex: experience(list), pr: profiles(list), wr: writing(list), rt: rethink(list), co: completion(list) }), [list]);
   const filtered = f.days || f.route || f.only || f.q;
   const filterNote = [f.days ? `last ${f.days} day${f.days > 1 ? "s" : ""}` : "", f.route === "free" ? "Imagine Freely" : f.route === "configure" ? "Configure route" : "", f.only === "done" ? "submitted only" : f.only === "open" ? "not finished" : "", f.q ? `code contains “${f.q}”` : ""].filter(Boolean).join(", ");
   const sel = openCode ? sessions.find((s) => s.code === openCode) : null;

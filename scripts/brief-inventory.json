@@ -1,0 +1,248 @@
+{
+ "dimensions": [
+  {
+   "n": 1,
+   "required": true,
+   "question": "How would decisions be made?",
+   "choices": [
+    "Central leadership",
+    "Collective decisions",
+    "Distributed authority",
+    "Decisions by affected groups",
+    "Different arrangements for different matters"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 2,
+   "required": false,
+   "question": "How would different areas of knowledge come together?",
+   "choices": [
+    "Disciplinary",
+    "Multidisciplinary",
+    "Interdisciplinary",
+    "Transdisciplinary",
+    "Theme-, problem- or question-based",
+    "No fixed disciplinary boundaries"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 3,
+   "required": true,
+   "question": "Where would learners spend most of their time learning?",
+   "choices": [
+    "Classrooms or lecture spaces",
+    "Studios, workshops or laboratories",
+    "Workplaces or professional organisations",
+    "Community settings",
+    "Homes or personal spaces",
+    "Public or cultural spaces",
+    "Natural or outdoor environments",
+    "Digital environments"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 4,
+   "required": true,
+   "question": "How would learning be organised?",
+   "choices": [
+    "Individual learning",
+    "Cohort or group learning",
+    "Course/programme structure",
+    "Project-organised learning",
+    "Self-directed learning",
+    "Apprenticeship or practice-based structure",
+    "Open-ended or continuous learning"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 5,
+   "required": true,
+   "question": "Who can participate, and how would they belong?",
+   "choices": [
+    "Open participation",
+    "Formal enrolment",
+    "Core members plus an extended community",
+    "Contribution-based membership",
+    "Temporary project/activity membership",
+    "Differentiated forms of participation"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 6,
+   "required": true,
+   "question": "Who contributes to learning, which group is most regularly involved, and what roles should the institution provide?",
+   "choices": [
+    "Academic teachers",
+    "Professional practitioners",
+    "Artists, craftspeople and makers",
+    "Community knowledge holders",
+    "Peers and fellow learners",
+    "External experts"
+   ],
+   "participantDefined": false
+  },
+  {
+   "n": 7,
+   "required": false,
+   "question": "How would people know learning has taken place?",
+   "choices": [
+    "Projects",
+    "Portfolios",
+    "Practical performance",
+    "Written examinations",
+    "Oral presentations",
+    "Peer assessment",
+    "Self-assessment",
+    "Continuous feedback",
+    "Demonstration of capabilities"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 8,
+   "required": false,
+   "question": "How should people receive recognition for learning?",
+   "choices": [
+    "Degrees",
+    "Certificates",
+    "Portfolios",
+    "Demonstrated capabilities",
+    "Competence-based recognition",
+    "Professional recognition",
+    "Peer or community recognition",
+    "Multiple forms",
+    "No formal credential"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 9,
+   "required": false,
+   "question": "How should learning relate to work and everyday life?",
+   "choices": [
+    "Preparation for employment",
+    "Learning alongside employment",
+    "Professional practice",
+    "Entrepreneurship or self-employment",
+    "Community contribution",
+    "Care work",
+    "Ecological work",
+    "Unpaid work",
+    "Learning independent of employment"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 10,
+   "required": false,
+   "question": "What role should technology and AI play, and in which activities?",
+   "choices": [
+    "Minimal or no digital use",
+    "Communication/access infrastructure",
+    "Digital knowledge resources",
+    "Practical experimentation",
+    "Personalised learning support",
+    "AI-supported learning",
+    "AI in institutional processes"
+   ],
+   "participantDefined": true
+  },
+  {
+   "n": 11,
+   "required": true,
+   "question": "What is one way learning could happen in your institution?",
+   "choices": [
+    "What are people exploring, practising or creating?",
+    "What do learners actually do?",
+    "Who or what takes part?",
+    "Where does it happen?",
+    "How might it unfold? Add, reorder or remove steps; no fixed sequence.",
+    "What might participants make, understand or change?",
+    "Participant-defined details; fields may be skipped"
+   ],
+   "participantDefined": false
+  },
+  {
+   "n": 12,
+   "required": false,
+   "question": "How would people enter, progress, pause, return and complete learning?",
+   "choices": [
+    "Fixed-duration programme",
+    "Open-ended learning",
+    "Self-paced progress",
+    "Cohort-based progression",
+    "Continuous entry",
+    "Short intensive engagement",
+    "Flexible pause and return",
+    "Capability-based progression",
+    "Multiple pathways"
+   ],
+   "participantDefined": true
+  }
+ ],
+ "contributorGroups": [
+  "Academic teachers",
+  "Professional practitioners",
+  "Artists, craftspeople and makers",
+  "Community knowledge holders",
+  "Peers and fellow learners",
+  "External experts"
+ ],
+ "roles": [
+  "Teach and explain",
+  "Guide learning",
+  "Challenge and question",
+  "Demonstrate practice",
+  "Critique and give feedback",
+  "Assess achievement",
+  "Connect learning with opportunities",
+  "Provide personal support"
+ ],
+ "allocation": [
+  "People and mentoring",
+  "Library and knowledge resources",
+  "Studios and laboratories",
+  "Field and community engagement",
+  "Digital infrastructure",
+  "Physical infrastructure",
+  "Learner support and access",
+  "Accreditation and ranking"
+ ],
+ "reflection": [
+  "What do you find interesting or desirable about this institution?",
+  "What difficulties or contradictions might arise?",
+  "What would you change?"
+ ],
+ "experiencePrompts": [
+  "What are people exploring, practising or creating?",
+  "What do learners do?",
+  "Who or what takes part?",
+  "Where does it happen?",
+  "How does it unfold?",
+  "What might people make, understand or change?"
+ ],
+ "hubRequired": [
+  "Governance",
+  "Membership",
+  "Educators and Roles",
+  "Learning Process",
+  "Pedagogical Methods",
+  "Locations"
+ ],
+ "hubOptional": [
+  "Knowledge",
+  "Evaluation",
+  "Credentials",
+  "Learning and Work",
+  "Technology and AI",
+  "Time and Pathways"
+ ],
+ "noSingleGroup": "No single group—contributions would be broadly shared",
+ "purpose": "What should your institution make possible that existing institutions do not?",
+ "opening": "What might a different institution for learning look like?"
+}

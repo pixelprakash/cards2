@@ -59,9 +59,9 @@ export default function Shell() {
 
   // Remember the furthest stage reached.
   useEffect(() => {
-    if (!session.route) return;
+    if (!session.route || redirect) return;   // a screen the participant is sent away from has not been reached
     if (STAGE_RANK[stage] > STAGE_RANK[session.furthest]) update((d) => { d.furthest = stage; });
-  }, [stage, session.route, session.furthest, update]);
+  }, [stage, redirect, session.route, session.furthest, update]);
 
   // New screen: move focus to the main area (so screen readers start at the top) and scroll up.
   const first = useRef(true);

@@ -34,12 +34,15 @@ export function sampleSessions(n = 36) {
         if (dim.kind === "educators") { d.contributors.picks = some(CONTRIBUTOR_GROUPS.map((g) => g.id), 4); d.regular = rnd() < 0.2 ? NO_SINGLE_GROUP : d.contributors.picks[0]; d.roles.values = split100(EDUCATOR_ROLES.map((r) => r.id)); }
         s.dims[dim.id] = d;
       }
-      s.experience = { ideas: [], does: "Learners make something with a mentor", takesPart: { picks: [], custom: [] }, where: { picks: [], custom: [] }, steps: [], outcomes: "", status: "answered" };
+      s.experience = { ideas: [], does: "Learners make something with a mentor", takesPart: { picks: [], custom: [] }, where: { picks: [], custom: [] }, steps: [], outcomes: "", status: "unanswered" };
+      s.dims.pedagogy = { ...newDimension(), status: "answered" };
     }
     if (["activities", "institution", "reflection", "done"].includes(s.furthest)) {
       const ids = ALLOCATION_CATEGORIES.map((c) => c.id); s.activities.allocation = { values: split100(ids), custom: [], status: "answered" };
       if (rnd() < 0.5) { const t = pick(TENSIONS); s.activities.tensions = { selected: [{ id: t.id, a: t.a, b: t.b, own: false, useSlider: true, value: Math.round(rnd() * 100), note: "" }], status: "answered" }; }
       if (rnd() < 0.5) s.activities.purpose = { text: "A place where people can change what they believe is possible", status: "answered" };
+      s.activities.signature = rnd() < 0.3 ? { practice: "Every learner spends a season working beside someone in a trade", effect: "Learning is tied to real work", difficulty: "Hard to arrange for everyone", status: "answered" } : { ...s.activities.signature, status: rnd() < 0.35 ? "skipped" : "unanswered" };
+      if (!s.activities.purpose.text && rnd() < 0.35) s.activities.purpose.status = "skipped";
       if (rnd() < 0.4) s.activities.rethink = { items: { [pick(PRACTICES).id]: { action: pick(["keep", "change", "leave"]) } }, custom: [], status: "answered" };
     }
     if (["institution", "reflection", "done"].includes(s.furthest)) {

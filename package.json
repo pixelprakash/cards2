@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "check": "node scripts/check-flow.mjs"
+    "check": "node scripts/check-flow.mjs && node scripts/check-brief.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.16",

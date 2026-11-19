@@ -45,20 +45,38 @@ async function query(text, params) {
 }
 
 // A session that was withdrawn is never saved again, even if a slow save from the browser arrives afterwards.
+// A save only replaces what is stored if it is at least as new, so a slow older request that arrives late cannot undo a later one
+// (for example a mid-journey save landing after the final submit).
 export async function saveSession(rec) {
   await query(
     `INSERT INTO lid_sessions (id, code, route, furthest, created_at, updated_at, completed_at, data)
      SELECT $1::text, $2::text, $3::text, $4::text, $5::timestamptz, $6::timestamptz, $7::timestamptz, $8::jsonb
      WHERE NOT EXISTS (SELECT 1 FROM lid_withdrawn WHERE id = $1::text)
      ON CONFLICT (id) DO UPDATE SET furthest = EXCLUDED.furthest, updated_at = EXCLUDED.updated_at, completed_at = EXCLUDED.completed_at, data = EXCLUDED.data
-     WHERE lid_sessions.code = EXCLUDED.code`,
+     WHERE lid_sessions.code = EXCLUDED.code AND EXCLUDED.updated_at >= lid_sessions.updated_at`,
     [rec.id, rec.code, rec.route, rec.furthest, rec.createdAt, rec.updatedAt, rec.completedAt, JSON.stringify(rec)],
   );
 }
 
-export async function listSessions() {
-  const rows = await query("SELECT data FROM lid_sessions ORDER BY created_at");
-  return rows.map((r) => (typeof r.data === "string" ? JSON.parse(r.data) : r.data));
+// Sessions come back in pages, oldest first, because one response from a serverless function is limited to about 4.5 MB.
+// A page stops at `budget` characters of data or `step` rows, and `next` is the cursor for the page after it (null at the end).
+const CURSOR = /^\d{4}-\d\d-\d\dT[\d:.]+Z\|[a-z0-9_-]{1,40}$/;
+export const validCursor = (c) => typeof c === "string" && CURSOR.test(c);
+export async function listSessions({ after = "", budget = 2_500_000, step = 100 } = {}) {
+  const [at, id] = validCursor(after) ? after.split("|") : [null, null];
+  const rows = await query(
+    `SELECT id, to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS c, length(data::text) AS n, data
+     FROM lid_sessions WHERE ($1::timestamptz IS NULL OR (created_at, id) > ($1::timestamptz, $2::text))
+     ORDER BY created_at, id LIMIT $3`,
+    [at, id, step],
+  );
+  const out = []; let size = 0; let last = null; let cut = false;
+  for (const r of rows) {
+    const n = Number(r.n) || 0;
+    if (out.length && size + n > budget) { cut = true; break; }
+    out.push(typeof r.data === "string" ? JSON.parse(r.data) : r.data); size += n; last = `${r.c}|${r.id}`;
+  }
+  return { sessions: out, next: cut || rows.length === step ? last : null };
 }
 
 // A participant withdraws with their own session id and code (both are needed). A researcher deletes by code alone.

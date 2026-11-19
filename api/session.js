@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     if (!signInEnabled()) return json(res, 503, { error: "Sign-in is not set up yet. Set RESEARCHER_PASSWORD (at least 8 characters) in the project settings." });
-    let body = req.body;
+    let body; try { body = req.body; } catch { return json(res, 400, { error: "Invalid request." }); }
     if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
     const { user = "", password = "" } = body || {};
     if (typeof user !== "string" || typeof password !== "string" || user.length > 100 || password.length > 200) return json(res, 400, { error: "Invalid request." });

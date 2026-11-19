@@ -20,7 +20,7 @@ function download(name, type, data) {
 
 export default function Done() {
   useTitle("Thank you");
-  const { session, reset } = useSession();
+  const { session, reset, pending } = useSession();
   const navigate = useNavigate();
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState("");
@@ -48,6 +48,7 @@ export default function Done() {
     <div className="wrap narrow">
       <QBlock tone="green" eyebrow="Submitted" title="Thank you" question="Your institution has been submitted." hint="If you need to refer to your answers later, use your participant code." layered />
       <div className="stack-lg" style={{ marginTop: "2.5rem" }}>
+        {pending && <p className="panel" role="status"><b>Still sending your answers.</b> The connection is weak right now. They are safe on this device and will go to the research team as soon as it is back. Please keep this page open for a moment.</p>}
         <section className="panel" aria-labelledby="code-h"><h2 id="code-h" className="eyebrow">Your participant code</h2><button type="button" className="codebtn" onClick={copyCode} aria-label={`Participant code ${session.code}. Press to copy.`}><span className="code">{session.code}</span><span className="copy">Copy</span></button></section>
         {v && (
           <section className="sheet" aria-labelledby="prof-h">
@@ -71,8 +72,8 @@ export default function Done() {
         </section>
         <div><Ghost onClick={() => setConfirm(true)}>Start a new one</Ghost></div>
       </div>
-      <Dialog open={confirm} onClose={() => setConfirm(false)} title="Start a new institution?" actions={<button type="button" className="btn btn-soft" onClick={() => { reset(); navigate("/"); }}>Start again</button>}>
-        <p>This clears the answers saved in this browser. What you already submitted stays with the research team.</p>
+      <Dialog open={confirm} onClose={() => setConfirm(false)} title="Start a new institution?" actions={<button type="button" className="btn btn-soft" disabled={pending} onClick={() => { reset(); navigate("/"); }}>Start again</button>}>
+        <p>This clears the answers saved in this browser. {pending ? <b>Your last answers have not reached the research team yet, so please wait until the message about sending has gone.</b> : "What you already submitted stays with the research team."}</p>
       </Dialog>
     </div>
   );
