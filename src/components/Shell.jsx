@@ -88,7 +88,7 @@ export default function Shell() {
         <button type="button" onClick={() => setInfo("access")}>Accessibility</button>
         {pathname !== "/" && <a href="/researcher">Researcher login</a>}
         {session.route && <button type="button" onClick={() => setWithdraw(true)}>Withdraw my answers</button>}
-        <span style={{ marginLeft: "auto" }}>Participant code {session.route ? session.code : "is given when you start"}</span>
+        <span style={{ marginLeft: "auto" }}>{session.route ? `Your code: ${session.code}` : "Your code appears when you start"}</span>
       </footer>
       <InfoDialog which={info} onClose={() => setInfo(null)} />
       <Dialog open={withdraw} onClose={() => setWithdraw(false)} title="Withdraw your answers?"
@@ -96,7 +96,7 @@ export default function Shell() {
           queueWithdrawal({ id: session.id, code: session.code });   // instant here; the server delete finishes in the background
           setWithdraw(false); reset(); setNote("Done. Your answers are being removed."); navigate("/");
         }}>Withdraw</button>}>
-        <p>This deletes everything stored for participant code {session.code}, here and with the research team, and clears this browser. It cannot be undone.</p>
+        <p>This deletes everything stored under your code ({session.code}), both on this device and with the research team. It cannot be undone. If you take part again later, you will get a new code.</p>
       </Dialog>
       {note && <p className="toast" role="status" onAnimationEnd={() => setTimeout(() => setNote(""), 3500)}>{note}</p>}
     </div>

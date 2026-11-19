@@ -28,7 +28,7 @@ const STEPS = [
   ["See it, shape it", "You get a profile of your institution to edit, approve and reflect on."],
 ];
 const PROMISES = [
-  ["Anonymous", "No name. Just a code."],
+  ["Anonymous", "No name or email. Just a random code."],
   ["Saved as you go", "Close it, come back later."],
   ["Yours to withdraw", "Delete your answers any time."],
 ];

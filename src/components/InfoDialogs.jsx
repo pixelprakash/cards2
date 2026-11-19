@@ -19,7 +19,7 @@ export const INFO = {
     body: (
       <>
         <p>This is a research experience about how students and faculty imagine possible institutions for learning. It is not a university builder, a prediction, a ranking or a feasibility test.</p>
-        <p>You are given an anonymous participant code. Your answers are stored against that code, not your name.</p>
+        <p>You get a random code instead of a name, and your answers are stored under that code. If you ever want them removed, give the research team your code and they will delete them. The code cannot reopen your answers, so it is only for finding and removing them.</p>
         {PENDING}
       </>
     ),

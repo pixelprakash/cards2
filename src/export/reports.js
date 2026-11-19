@@ -46,7 +46,8 @@ export function participantReport(s, { own = false } = {}) {
 function ownReport(s, profile) {
   const blocks = [
     { type: "title", text: "My institution" },
-    { type: "note", text: `Learning Institutions by Design · participant code ${s.code} · ${date(s.completedAt ?? new Date().toISOString())}` },
+    { type: "note", text: `Learning Institutions by Design · your code ${s.code} · ${date(s.completedAt ?? new Date().toISOString())}` },
+    { type: "note", text: "Keep your code. If you ever want your answers removed, give it to the research team. It has no name in it and cannot reopen your answers." },
   ];
   if (profile) SECTIONS.forEach((sec) => { blocks.push({ type: "h1", text: sec.title }); blocks.push({ type: "p", text: profile.sections?.[sec.id] || EMPTY_SECTION }); });
   blocks.push({ type: "h1", text: "My answers" });
